@@ -14,3 +14,11 @@ Get[NotebookDirectory[]<>"setupAccounts.m"]
 
 
 setupBankAccounts[]
+
+
+(* ::Subsection:: *)
+(*Importing from accounts*)
+
+
+importForm = SelectAccountsForm[
+ files = ListImportableFiles[NotebookDirectory[] <> "toImport/"]]

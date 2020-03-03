@@ -12,3 +12,10 @@ parse the files.";
 BankAccountNameQ::usage = "BankAccountNameQ[str] checks whether str corresponds to \
 the name of a bank account.";
 ListBankAccounts::usage = "ListBankAccounts[] lists the names of bank accounts active.";
+
+
+ListImportableFiles::usage = "ListImportableFiles[directory] returns a list of files in \
+directory that match one or more filePattern among the active accounts.";
+
+
+SelectAccountsForm

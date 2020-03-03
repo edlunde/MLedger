@@ -52,3 +52,30 @@ AddTest[bankAccountObjectsTests, "testListBankAccounts",
  AddBankAccount[#, "USD", "", Null] & /@ {"test1", "test2"};
  AssertEquals[{"test1", "test2"}, ListBankAccounts[]];
 ];
+
+
+AddTest[bankAccountObjectsTests, "testListImportableFiles", 
+ AddBankAccount["Example account USD", "USD", "export"~~___~~".csv", Null];
+ AssertTrue[Length@FileNames@testFilesDir > 0];
+ AssertEquals[{"export 0.csv"}, 
+  FileNameTake/@ListImportableFiles[testFilesDir]];
+];
+
+
+(* ::Subsubsection:: *)
+(*Internal tests*)
+
+
+Begin["MLedger`Private`"];
+AddTest[bankAccountObjectsTests, "testIsImportableFile",
+ AddBankAccount["Example account USD", "USD", "stmt"~~___~~".txt", Null];
+
+ AssertTrue[!isImportableFile[1]];
+ AssertTrue[!isImportableFile[{}]];
+ AssertTrue[!isImportableFile[Symbol]];
+ 
+ AssertTrue[isImportableFile["stmt.txt"]];
+ AssertTrue[isImportableFile["someFolder/stmt .txt"]];
+ AssertTrue[!isImportableFile["st.txt"]];
+];
+End[];

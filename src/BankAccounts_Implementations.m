@@ -16,3 +16,12 @@ Module[{bankAccounts = {}},
 BankAccountNameQ[account_] := StringQ@account && MemberQ[ListBankAccounts[], account]
 
 ListBankAccounts[] := GetBankAccounts[][[All, "name"]]
+
+
+ListImportableFiles[directory_] := FileNames[file__ /; isImportableFile[file], directory]
+
+
+isImportableFile[fileName_] := 
+ StringQ[fileName] && Length@getMatchingAccounts[fileName] > 0
+getMatchingAccounts[fileName_String] := 
+ Select[GetBankAccounts[], StringMatchQ[FileNameTake[fileName], #["filePattern"]] &]

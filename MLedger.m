@@ -15,6 +15,13 @@ parse the files.";
 BankAccountNameQ::usage = "BankAccountNameQ[str] checks whether str corresponds to \
 the name of a bank account.";
 ListBankAccounts::usage = "ListBankAccounts[] lists the names of bank accounts active.";
+
+
+ListImportableFiles::usage = "ListImportableFiles[directory] returns a list of files in \
+directory that match one or more filePattern among the active accounts.";
+
+
+SelectAccountsForm
 (* ::Section:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -36,6 +43,15 @@ Module[{bankAccounts = {}},
 BankAccountNameQ[account_] := StringQ@account && MemberQ[ListBankAccounts[], account]
 
 ListBankAccounts[] := GetBankAccounts[][[All, "name"]]
+
+
+ListImportableFiles[directory_] := FileNames[file__ /; isImportableFile[file], directory]
+
+
+isImportableFile[fileName_] := 
+ StringQ[fileName] && Length@getMatchingAccounts[fileName] > 0
+getMatchingAccounts[fileName_String] := 
+ Select[GetBankAccounts[], StringMatchQ[FileNameTake[fileName], #["filePattern"]] &]
 (* ::Subsection::Closed:: *)
 (*Tail*)
 End[];

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Merges all functions into a single Mathematica-package MLedger.m
+
 scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # We place the combined file one folder level up
