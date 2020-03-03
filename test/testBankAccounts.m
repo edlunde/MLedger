@@ -13,29 +13,42 @@ AddSuite[bankAccountsTests, bankAccountObjectsTests];
      and that any old accounts are restored*)
 Module[{accounts},
  AddTest[bankAccountObjectsTests, "Set Up", 
-  accounts = getBankAccounts[];
-  setBankAccounts[{}];
+  accounts = GetBankAccounts[];
+  SetBankAccounts[{}];
  ];
  AddTest[bankAccountObjectsTests, "Tear Down",
-  setBankAccounts[accounts];
+  SetBankAccounts[accounts];
  ];
 ]
 
 
 AddTest[bankAccountObjectsTests, "testGetSetBankAccounts",
- AssertEquals[{}, getBankAccounts[]];
- setBankAccounts[{""}];
- AssertEquals[{""}, getBankAccounts[]];
+ AssertEquals[{}, GetBankAccounts[]];
+ SetBankAccounts[{""}];
+ AssertEquals[{""}, GetBankAccounts[]];
 ];
 
 AddTest[bankAccountObjectsTests, "testAddBankAccount",
- AssertEquals[{}, getBankAccounts[]];
- addBankAccount["testAccount", "SEK", "", ""];
- AssertEquals[1, Length@getBankAccounts[]];
+ AssertEquals[{}, GetBankAccounts[]];
+ AddBankAccount["testAccount", "SEK", "", ""];
+ AssertEquals[1, Length@GetBankAccounts[]];
  AssertEquals[{"name", "currency", "filePattern", "importFunction"}, 
-  Keys@getBankAccounts[][[1]]];
- AssertEquals["testAccount", getBankAccounts[][[1]]["name"]];
- AssertEquals["SEK", getBankAccounts[][[1]]["currency"]];
- AssertEquals["", getBankAccounts[][[1]]["filePattern"]];
- AssertEquals["", getBankAccounts[][[1]]["importFunction"]];
+  Keys@GetBankAccounts[][[1]]];
+ AssertEquals["testAccount", GetBankAccounts[][[1]]["name"]];
+ AssertEquals["SEK", GetBankAccounts[][[1]]["currency"]];
+ AssertEquals["", GetBankAccounts[][[1]]["filePattern"]];
+ AssertEquals["", GetBankAccounts[][[1]]["importFunction"]];
+];
+
+AddTest[bankAccountObjectsTests, "testBankAccountNameQ",
+ AddBankAccount[#, "USD", "", Null] & /@ {"test1", "test2"};
+ AssertTrue[Not@BankAccountNameQ@1];
+ AssertTrue[Not@BankAccountNameQ@"test"];
+ AssertTrue[BankAccountNameQ@"test1"];
+ AssertTrue[BankAccountNameQ@"test2"];
+];
+
+AddTest[bankAccountObjectsTests, "testListBankAccounts",
+ AddBankAccount[#, "USD", "", Null] & /@ {"test1", "test2"};
+ AssertEquals[{"test1", "test2"}, ListBankAccounts[]];
 ];
