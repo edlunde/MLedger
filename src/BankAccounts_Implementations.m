@@ -21,7 +21,7 @@ ListBankAccounts[] := GetBankAccounts[][[All, "name"]]
 BankAccountNameQ[account_] := StringQ@account && MemberQ[ListBankAccounts[], account]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Importing bank statements*)
 
 
@@ -57,3 +57,14 @@ importFile[fileName_?importableFileQ, accountName_String] :=
 ]
 importFile[fileName_String, accountName_String] /; Not@importableFileQ@fileName := 
  Message[ImportAccountFiles::mssAccount, accountName, fileName]
+
+
+(* ::Subsection:: *)
+(*Bank specific functions*)
+
+
+(* ::Subsubsection:: *)
+(*Nordea*)
+
+
+nordeaFilePattern = "export" ~~ ___ ~~ ".csv"

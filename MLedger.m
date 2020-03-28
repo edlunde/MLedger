@@ -35,6 +35,14 @@ accounts from a SelectAccountsForm.";
 
 ImportAccountFiles::usage = "ImportAccountFiles[files, accountNames] imports data from \
 each files[[n]] assuming it belongs to the account with name accountNames[[n]]. ";
+
+
+(* ::Subsection::Closed:: *)
+(*Bank specific functions*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Nordea*)
 (* ::Section:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -97,6 +105,17 @@ importFile[fileName_?importableFileQ, accountName_String] :=
 ]
 importFile[fileName_String, accountName_String] /; Not@importableFileQ@fileName := 
  Message[ImportAccountFiles::mssAccount, accountName, fileName]
+
+
+(* ::Subsection::Closed:: *)
+(*Bank specific functions*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Nordea*)
+
+
+nordeaFilePattern = "export" ~~ ___ ~~ ".csv"
 (* ::Subsection::Closed:: *)
 (*Tail*)
 End[];

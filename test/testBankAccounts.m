@@ -105,7 +105,7 @@ AddTest[importBankStatementsTests, "testImportAccountFiles",
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Internal tests*)
 
 
@@ -122,4 +122,28 @@ AddTest[importBankStatementsTestsInternal, "testImportableFileQ",
  AssertTrue[importableFileQ["someFolder/stmt .txt"]];
  AssertTrue[!importableFileQ["st.txt"]];
 ];
+End[];
+
+
+(* ::Subsection:: *)
+(*Test bank specific functions*)
+
+
+AddSuite[bankAccountsTests, bankSpecificTests];
+
+
+(* ::Subsubsection:: *)
+(*Nordea*)
+
+
+AddSuite[bankSpecificTests, nordeaTests];
+
+
+Begin["MLedger`Private`"];
+AddSuite[nordeaTests, nordeaTestsInternal];
+AddTest[nordeaTests, "testNordeaFilePattern",
+ AssertTrue[StringMatchQ["export.csv", nordeaFilePattern]];
+ AssertTrue[StringMatchQ["export0.csv", nordeaFilePattern]];
+ AssertTrue[StringMatchQ["export (copy).csv", nordeaFilePattern]];
+]
 End[];

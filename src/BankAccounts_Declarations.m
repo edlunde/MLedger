@@ -32,3 +32,11 @@ accounts from a SelectAccountsForm.";
 
 ImportAccountFiles::usage = "ImportAccountFiles[files, accountNames] imports data from \
 each files[[n]] assuming it belongs to the account with name accountNames[[n]]. ";
+
+
+(* ::Subsection:: *)
+(*Bank specific functions*)
+
+
+(* ::Subsubsection:: *)
+(*Nordea*)
