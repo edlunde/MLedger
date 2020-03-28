@@ -55,7 +55,7 @@ AddTest[bankAccountObjectsTests, "testListBankAccounts",
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test importing bank statements*)
 
 
@@ -139,11 +139,40 @@ AddSuite[bankAccountsTests, bankSpecificTests];
 AddSuite[bankSpecificTests, nordeaTests];
 
 
+AddTest[nordeaTests, "testAddNordeaAccount",
+ AddNordeaAccount["nordeaTestAcc"];
+ AssertTrue[MemberQ[ListBankAccounts[], "nordeaTestAcc"]];
+ With[{account = First@Select[GetBankAccounts[], #[["name"]] == "nordeaTestAcc" &]},
+  AssertEquals["SEK", account[["currency"]]];
+  AssertEquals[MLedger`Private`importNordea, account[["importFunction"]]];
+  AssertTrue[StringMatchQ["export.csv", account[["filePattern"]]]];
+ ];
+];
+
+
 Begin["MLedger`Private`"];
 AddSuite[nordeaTests, nordeaTestsInternal];
-AddTest[nordeaTests, "testNordeaFilePattern",
+
+AddTest[nordeaTestsInternal, "testNordeaFilePattern",
  AssertTrue[StringMatchQ["export.csv", nordeaFilePattern]];
  AssertTrue[StringMatchQ["export0.csv", nordeaFilePattern]];
  AssertTrue[StringMatchQ["export (copy).csv", nordeaFilePattern]];
-]
+];
+
+AddTest[nordeaTestsInternal, "testImportNordea",
+ With[{filename = testFilesDir <> "export0.csv"},
+  AssertTrue[Length@FileNames[filename] > 0];
+  With[{imported = importNordea[filename, "nordeaTestAcc"]},
+   AssertEquals[17, Length@imported];
+   
+   AssertEquals["2003-10-14", imported[[1, "date"]]];
+   AssertEquals["ATM Withdrawal - ITERAC", imported[[3, "description"]]];
+   AssertEquals[-33.55`, imported[[-5, "amount"]]];
+   AssertEquals[-72.47, imported[[-1, "balance"]]];
+   AssertEquals["nordeaTestAcc", imported[[-1, "account"]]];
+   AssertEquals["SEK", imported[[-1, "currency"]]];
+  ];
+ ];
+];
+
 End[];

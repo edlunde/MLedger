@@ -40,3 +40,7 @@ each files[[n]] assuming it belongs to the account with name accountNames[[n]]. 
 
 (* ::Subsubsection:: *)
 (*Nordea*)
+
+
+AddNordeaAccount::"usage" = "AddNewNordeaAccount[accountName] creates a new \
+Nordea account named accountName."

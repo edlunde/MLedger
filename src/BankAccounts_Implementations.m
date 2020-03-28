@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Bank account objects*)
 
 
@@ -67,4 +67,24 @@ importFile[fileName_String, accountName_String] /; Not@importableFileQ@fileName 
 (*Nordea*)
 
 
-nordeaFilePattern = "export" ~~ ___ ~~ ".csv"
+AddNordeaAccount[accountName_String] := 
+ AddBankAccount[accountName, "SEK", nordeaFilePattern, importNordea]
+
+
+nordeaFilePattern = "export" ~~ ___ ~~ ".csv";
+
+
+importNordea[filename_String, account_String] := 
+ handleNordeaLine[account] /@ Import[filename]
+ 
+handleNordeaLine[account_String] := handleNordeaLine[#, account] &
+handleNordeaLine[
+  {"Datum", "Transaktion", "Kategori", "Belopp", "Saldo"}, account_String
+  ] := Sequence[]
+handleNordeaLine[
+  {dateString_String, description_String, type_String, amount_?NumericQ, 
+   balance_?NumericQ}, account_String
+  ] := <|
+    "date" -> dateString, "description" -> description, "amount" -> amount,
+    "balance" -> balance, "account" -> account, "currency" -> "SEK"
+    |>
