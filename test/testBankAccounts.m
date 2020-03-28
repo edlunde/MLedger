@@ -132,7 +132,53 @@ End[];
 AddSuite[bankAccountsTests, bankSpecificTests];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
+(*Bank of America*)
+
+
+AddSuite[bankSpecificTests, BoATests];
+
+
+AddTest[BoATests, "testAddBoAAccount",
+ AddBoAAccount["BoATestAcc"];
+ AssertTrue[MemberQ[ListBankAccounts[], "BoATestAcc"]];
+ With[{account = First@Select[GetBankAccounts[], #[["name"]] == "BoATestAcc" &]},
+  AssertEquals["USD", account[["currency"]]];
+  AssertEquals[MLedger`Private`importBoA, account[["importFunction"]]];
+  AssertTrue[StringMatchQ["stmt.txt", account[["filePattern"]]]];
+ ];
+];
+
+
+Begin["MLedger`Private`"];
+AddSuite[BoATests, BoATestsInternal];
+
+AddTest[BoATestsInternal, "testBoAFilePattern",
+ AssertTrue[StringMatchQ["stmt.txt", BoAFilePattern]];
+ AssertTrue[StringMatchQ["stmt0.txt", BoAFilePattern]];
+ AssertTrue[StringMatchQ["stmt (copy).txt", BoAFilePattern]];
+];
+
+AddTest[BoATestsInternal, "testImportBoA",
+ With[{filename = testFilesDir <> "stmt.txt"},
+  AssertTrue[Length@FileNames[filename] > 0];
+  With[{imported = importBoA[filename, "BoATestAcc"]},
+   AssertEquals[17, Length@imported];
+   
+   AssertEquals["2003-10-14", imported[[1, "date"]]];
+   AssertEquals["ATM Withdrawal - ITERAC", imported[[3, "description"]]];
+   AssertEquals[-33.55`, imported[[-5, "amount"]]];
+   AssertEquals[-72.47, imported[[-1, "balance"]]];
+   AssertEquals["BoATestAcc", imported[[-1, "account"]]];
+   AssertEquals["USD", imported[[-1, "currency"]]];
+  ];
+ ];
+];
+
+End[];
+
+
+(* ::Subsubsection::Closed:: *)
 (*Nordea*)
 
 

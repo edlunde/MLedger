@@ -39,6 +39,14 @@ each files[[n]] assuming it belongs to the account with name accountNames[[n]]. 
 
 
 (* ::Subsubsection:: *)
+(*Bank of America*)
+
+
+AddBoAAccount::"usage" = "AddBoAAccount[accountName] creates a new \
+Bank of America account named accountName."
+
+
+(* ::Subsubsection:: *)
 (*Nordea*)
 
 

@@ -42,6 +42,14 @@ each files[[n]] assuming it belongs to the account with name accountNames[[n]]. 
 
 
 (* ::Subsubsection::Closed:: *)
+(*Bank of America*)
+
+
+AddBoAAccount::"usage" = "AddBoAAccount[accountName] creates a new \
+Bank of America account named accountName."
+
+
+(* ::Subsubsection::Closed:: *)
 (*Nordea*)
 
 
@@ -113,6 +121,40 @@ importFile[fileName_String, accountName_String] /; Not@importableFileQ@fileName 
 
 (* ::Subsection::Closed:: *)
 (*Bank specific functions*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Bank of America*)
+
+
+AddBoAAccount[accountName_String] := 
+ AddBankAccount[accountName, "USD", BoAFilePattern, importBoA]
+
+
+BoAFilePattern = "stmt" ~~ ___ ~~ ".txt";
+
+
+importBoA[filename_String, account_String] := 
+ handleBoALine[account] /@ extractTableBoA@Import[filename]
+ 
+extractTableBoA[str_String] :=
+ StringTrim /@ DeleteCases[StringSplit[#, "  "], ""] & /@ StringSplit[str, "\n"]
+ 
+handleBoALine[account_String] := handleBoALine[#, account] &
+handleBoALine[list_List /; Length@list < 4, account_String] := Sequence[]
+handleBoALine[
+  {dateString_String, description_String, 
+   amount_?numberStringQ, balance_?numberStringQ}, 
+  account_String
+  ] := <|
+    "date" -> DateString[
+     DateList[{dateString, {"Month", "Day", "Year"}}], 
+      {"Year", "-", "Month", "-", "Day"}], 
+    "description" -> description, "amount" -> ToExpression@amount,
+    "balance" -> ToExpression@balance, "account" -> account, "currency" -> "USD"
+    |>
+numberStringQ[str_String] := StringMatchQ[str, NumberString]
+numberStringQ[obj___] := False
 
 
 (* ::Subsubsection::Closed:: *)
