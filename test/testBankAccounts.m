@@ -3,23 +3,24 @@
 AddSuite[MLedgerTests, bankAccountsTests];
 
 
-(* ::Subsection:: *)
+(* Make sure we get a clean list of bank accounts each test, 
+     and that any old accounts are restored*)
+Module[{accounts},
+ AddTest[bankAccountsTests, "Set Up", 
+  accounts = GetBankAccounts[];
+  SetBankAccounts[{}];
+ ];
+ AddTest[bankAccountsTests, "Tear Down",
+  SetBankAccounts[accounts];
+ ];
+]
+
+
+(* ::Subsection::Closed:: *)
 (*Test bank account objects*)
 
 
 AddSuite[bankAccountsTests, bankAccountObjectsTests];
-
-(* Make sure we get a clean list of bank accounts each test, 
-     and that any old accounts are restored*)
-Module[{accounts},
- AddTest[bankAccountObjectsTests, "Set Up", 
-  accounts = GetBankAccounts[];
-  SetBankAccounts[{}];
- ];
- AddTest[bankAccountObjectsTests, "Tear Down",
-  SetBankAccounts[accounts];
- ];
-]
 
 
 AddTest[bankAccountObjectsTests, "testGetSetBankAccounts",
@@ -54,28 +55,71 @@ AddTest[bankAccountObjectsTests, "testListBankAccounts",
 ];
 
 
-AddTest[bankAccountObjectsTests, "testListImportableFiles", 
- AddBankAccount["Example account USD", "USD", "export"~~___~~".csv", Null];
+(* ::Subsection:: *)
+(*Test importing bank statements*)
+
+
+AddSuite[bankAccountsTests, importBankStatementsTests];
+
+AddTest[importBankStatementsTests, "Set Up", 
+ AddBankAccount["Example account USD", "USD", "export"~~___~~".csv", importF1];
+ AddBankAccount["Example account USD 2", "USD", "stmt"~~___~~".txt", importF2];
+];
+
+
+AddTest[importBankStatementsTests, "testListImportableFiles", 
  AssertTrue[Length@FileNames@testFilesDir > 0];
- AssertEquals[{"export 0.csv"}, 
+ AssertEquals[{"export0.csv", "stmt.txt"}, 
   FileNameTake/@ListImportableFiles[testFilesDir]];
 ];
 
 
-(* ::Subsubsection:: *)
+AddTest[importBankStatementsTests, "testSelectAccountsForm", 
+ AssertTrue[Length@FileNames@testFilesDir > 0];
+ With[{form = SelectAccountsForm@ListImportableFiles[testFilesDir]},
+ AssertMatch[Grid[___], form];
+ AssertMatch[Grid[{___,
+                   {"export0.csv", PopupMenu[Dynamic[_], {"Example account USD"}, ___]},
+                   ___}], 
+             form];
+ AssertMatch[Grid[{___,
+                   {"stmt.txt", PopupMenu[Dynamic[_], {"Example account USD 2"}, ___]},
+                   ___}], 
+             form];
+ ]
+];
+
+
+AddTest[importBankStatementsTests, "testImportAccountFiles", 
+ With[{files = FileNames[#, testFilesDir]& /@ {"export0.csv", "stmt.txt"}},
+  AssertTrue[Length@files > 0];
+  With[{accounts = MLedger`Private`getMatchingAccounts /@ First /@ files},
+   AssertTrue[And @@ (# > 0 & /@ Length /@ accounts)];
+   With[{imported = 
+     ImportAccountFiles[First /@ files, (First /@ accounts)[[All, "name"]]]},
+    AssertEquals[
+     {importF1[First@files[[1]], "Example account USD"], 
+      importF2[First@files[[2]], "Example account USD 2"]}, 
+     imported];
+   ]]];
+];
+
+
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
 Begin["MLedger`Private`"];
-AddTest[bankAccountObjectsTests, "testIsImportableFile",
- AddBankAccount["Example account USD", "USD", "stmt"~~___~~".txt", Null];
+AddSuite[importBankStatementsTests, importBankStatementsTestsInternal]
+AddTest[importBankStatementsTestsInternal, "testImportableFileQ",
+ AddBankAccount["Example account USD 2", "USD", "stmt"~~___~~".txt", Null];
 
- AssertTrue[!isImportableFile[1]];
- AssertTrue[!isImportableFile[{}]];
- AssertTrue[!isImportableFile[Symbol]];
+ AssertTrue[!importableFileQ[1]];
+ AssertTrue[!importableFileQ[{}]];
+ AssertTrue[!importableFileQ[Symbol]];
  
- AssertTrue[isImportableFile["stmt.txt"]];
- AssertTrue[isImportableFile["someFolder/stmt .txt"]];
- AssertTrue[!isImportableFile["st.txt"]];
+ AssertTrue[importableFileQ["stmt.txt"]];
+ AssertTrue[importableFileQ["someFolder/stmt .txt"]];
+ AssertTrue[!importableFileQ["st.txt"]];
 ];
 End[];

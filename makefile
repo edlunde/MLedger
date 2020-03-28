@@ -1,4 +1,7 @@
 
+.PHONY: all
+all: test
+
 .PHONY: test
 test: MLedger.m test/testScript.sh
 	./test/testScript.sh

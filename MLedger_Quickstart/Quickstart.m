@@ -22,3 +22,6 @@ setupBankAccounts[]
 
 importForm = SelectAccountsForm[
  files = ListImportableFiles[NotebookDirectory[] <> "toImport/"]]
+
+
+imported = ImportAccountFiles[files, ExtractSelectedAccounts[importForm]]

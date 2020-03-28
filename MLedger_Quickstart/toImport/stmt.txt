@@ -1,0 +1,26 @@
+Description                                                                                      Summary Amt.
+Beginning balance as of 10/09/2003                                                                       0.55
+Total credits                                                                                        1,442.61
+Total debits                                                                                        -1,515.63
+Ending balance as of 11/08/2003                                                                        -72.47
+                                                                                                               
+                                                                                                               
+Date           Description                                                                  Amount Running Bal.
+10/08/2003     Beginning balance as of 10/09/2003                                                          0.55
+10/14/2003     Payroll Deposit - HOTEL                                                      694.81       695.36
+10/14/2003     Web Bill Payment - MASTERCARD                                               -200.00       495.36
+10/16/2003     ATM Withdrawal - ITERAC                                                      -21.25       474.11
+10/16/2003     Fees - Interac                                                                -1.50       472.61
+10/20/2003     Interac Purchase - ELECTRONICS                                                -2.99       469.62
+10/21/2003     Web Bill Payment - AMEX                                                     -300.00       169.62
+10/22/2003     ATM Withdrawal - FIRST BANK                                                 -100.00        69.62
+10/23/2003     Interac Purchase - SUPERMARKET                                               -29.08        40.54
+10/24/2003     Interac Refund - ELECTRONICS                                                   2.99        43.53
+10/27/2003     Telephone Bill Payment - VISA                                                 -6.77        36.76
+10/28/2003     Payroll Deposit - HOTEL                                                      731.57       731.57
+10/30/2003     Web Funds Transfer - From SAVINGS                                             50.00       781.57
+11/03/2003     Pre-Auth. Payment - INSURANCE                                                -33.55       781.57
+11/03/2003     Cheque No. - 409                                                            -100.00       748.02
+11/06/2003     Mortgage Payment                                                            -710.49       648.02
+11/07/2003     Fees - Overdraft                                                              -5.00       -62.47
+11/08/2003     Fees - Monthly                                                                -5.00       -72.47
