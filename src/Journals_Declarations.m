@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* ::Subsection:: *)
-(*Journals*)
+(*Journal*)
 
 
 CreateJournalEntry::usage = "CreateJournalEntry[date, description, amount,\

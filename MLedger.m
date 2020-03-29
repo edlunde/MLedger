@@ -62,7 +62,7 @@ Nordea account named accountName."
 (* ::Package:: *)
 
 (* ::Subsection::Closed:: *)
-(*Journals*)
+(*Journal*)
 
 
 CreateJournalEntry::usage = "CreateJournalEntry[date, description, amount,\
@@ -162,13 +162,10 @@ handleBoALine[
   {dateString_String, description_String, 
    amount_?numberStringQ, balance_?numberStringQ}, 
   account_String
-  ] := <|
-    "date" -> DateString[
-     DateList[{dateString, {"Month", "Day", "Year"}}], 
-      {"Year", "-", "Month", "-", "Day"}], 
-    "description" -> description, "amount" -> ToExpression@amount,
-    "balance" -> ToExpression@balance, "account" -> account, "currency" -> "USD"
-    |>
+  ] := CreateJournalEntry[
+    toDateString@DateList[{dateString, {"Month", "Day", "Year"}}], 
+    description, ToExpression@amount, ToExpression@balance, account, "USD"
+    ]
 numberStringQ[str_String] := StringMatchQ[str, NumberString]
 numberStringQ[obj___] := False
 
@@ -194,10 +191,7 @@ handleNordeaLine[
 handleNordeaLine[
   {dateString_String, description_String, type_String, amount_?NumericQ, 
    balance_?NumericQ}, account_String
-  ] := <|
-    "date" -> dateString, "description" -> description, "amount" -> amount,
-    "balance" -> balance, "account" -> account, "currency" -> "SEK"
-    |>
+  ] := CreateJournalEntry[dateString, description, amount, balance, account, "SEK"]
 (* ::Section:: *)
 (*Journals*)
 (* ::Package:: *)

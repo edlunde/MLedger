@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Bank account objects*)
 
 
@@ -63,7 +63,7 @@ importFile[fileName_String, accountName_String] /; Not@importableFileQ@fileName 
 (*Bank specific functions*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Bank of America*)
 
 
@@ -86,18 +86,15 @@ handleBoALine[
   {dateString_String, description_String, 
    amount_?numberStringQ, balance_?numberStringQ}, 
   account_String
-  ] := <|
-    "date" -> DateString[
-     DateList[{dateString, {"Month", "Day", "Year"}}], 
-      {"Year", "-", "Month", "-", "Day"}], 
-    "description" -> description, "amount" -> ToExpression@amount,
-    "balance" -> ToExpression@balance, "account" -> account, "currency" -> "USD"
-    |>
+  ] := CreateJournalEntry[
+    toDateString@DateList[{dateString, {"Month", "Day", "Year"}}], 
+    description, ToExpression@amount, ToExpression@balance, account, "USD"
+    ]
 numberStringQ[str_String] := StringMatchQ[str, NumberString]
 numberStringQ[obj___] := False
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Nordea*)
 
 
@@ -118,7 +115,4 @@ handleNordeaLine[
 handleNordeaLine[
   {dateString_String, description_String, type_String, amount_?NumericQ, 
    balance_?NumericQ}, account_String
-  ] := <|
-    "date" -> dateString, "description" -> description, "amount" -> amount,
-    "balance" -> balance, "account" -> account, "currency" -> "SEK"
-    |>
+  ] := CreateJournalEntry[dateString, description, amount, balance, account, "SEK"]
