@@ -1,6 +1,8 @@
 BeginPackage["MLedger`"];
-(* ::Section:: *)
+(* ::Chapter:: *)
 (*Declarations*)
+(* ::Section:: *)
+(*BankAccounts*)
 (* ::Package:: *)
 
 (* ::Subsection::Closed:: *)
@@ -56,8 +58,19 @@ Bank of America account named accountName."
 AddNordeaAccount::"usage" = "AddNewNordeaAccount[accountName] creates a new \
 Nordea account named accountName."
 (* ::Section:: *)
+(*Journals*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Journals*)
+
+
+CreateJournalEntry::usage = "CreateJournalEntry[] ";
+(* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
+(* ::Section:: *)
+(*BankAccounts*)
 (* ::Package:: *)
 
 (* ::Subsection::Closed:: *)
@@ -182,9 +195,21 @@ handleNordeaLine[
     "date" -> dateString, "description" -> description, "amount" -> amount,
     "balance" -> balance, "account" -> account, "currency" -> "SEK"
     |>
+(* ::Section:: *)
+(*Journals*)
+(* ::Package:: *)
+
 (* ::Subsection::Closed:: *)
+(*Journals*)
+
+
+CreateJournalEntry[] := <|
+ "date"->"1-01-01", "description"->"", "amount"->0.`, "balance"->0.`,
+ "account"->"", "currency"->"", "category"->""
+ |>
+(* ::Section::Closed:: *)
 (*Tail*)
 End[];
-(* ::Section::Closed:: *)
+(* ::Chapter::Closed:: *)
 (*Tail*)
 EndPackage[]

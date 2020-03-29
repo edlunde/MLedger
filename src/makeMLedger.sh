@@ -7,27 +7,33 @@ scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # We place the combined file one folder level up
 targetFile=$(dirname "${scriptDir}")/MLedger.m
 
-# The source files
-declarationsFiles=${scriptDir}"/BankAccounts_Declarations.m"
-implementationsFiles=${scriptDir}"/BankAccounts_Implementations.m"
+
+# Array with name stems for source files
+srcNames=("BankAccounts" "Journals")
 
 
-# Glue everything together
-
+##### Glue everything together
+# Overwrite with >
 printf 'BeginPackage["MLedger`"];\n' > "${targetFile}"
 
 
-printf '(* ::Section:: *)\n(*Declarations*)\n' >> "${targetFile}"
-cat "${declarationsFiles}" >> "${targetFile}"
+printf '(* ::Chapter:: *)\n(*Declarations*)\n' >> "${targetFile}"
+for f in ${srcNames[@]}; do
+    printf "(* ::Section:: *)\n(*${f}*)\n" >> "${targetFile}"
+    cat "${scriptDir}/${f}_Declarations.m" >> "${targetFile}"
+done
 
-printf '(* ::Section:: *)\n(*Implementations*)\n' >> "${targetFile}"
+printf '(* ::Chapter:: *)\n(*Implementations*)\n' >> "${targetFile}"
 printf 'Begin["`Private`"];\n' >> "${targetFile}"
-cat "${implementationsFiles}" >> "${targetFile}"
-printf '(* ::Subsection::Closed:: *)\n' >> "${targetFile}"
+for f in ${srcNames[@]}; do
+    printf "(* ::Section:: *)\n(*${f}*)\n" >> "${targetFile}"
+    cat "${scriptDir}/${f}_Implementations.m" >> "${targetFile}"
+done
+printf '(* ::Section::Closed:: *)\n' >> "${targetFile}"
 printf '(*Tail*)\n' >> "${targetFile}"
 printf 'End[];\n' >> "${targetFile}"
 
-printf '(* ::Section::Closed:: *)\n' >> "${targetFile}"
+printf '(* ::Chapter::Closed:: *)\n' >> "${targetFile}"
 printf '(*Tail*)\n' >> "${targetFile}"
 printf 'EndPackage[]\n' >> "${targetFile}"
 
