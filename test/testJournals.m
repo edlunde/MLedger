@@ -47,3 +47,13 @@ AddTest[journalTests, "testCreateJournalEntry",
     "testAccount", "USD", "Hotel", "FITID" -> 1234]];
 ];
 
+
+
+AddTest[journalTests, "testIsJournalEntry",
+ AssertTrue[Not@IsJournalEntry[1]];
+ AssertTrue[Not@IsJournalEntry[{1}]];
+ AssertTrue[Not@IsJournalEntry[<|"a" -> 2|>]];
+ AssertTrue[Not@IsJournalEntry@Drop[CreateJournalEntry[],3]];
+ AssertTrue[IsJournalEntry@CreateJournalEntry[]];
+ AssertTrue[IsJournalEntry@Reverse@CreateJournalEntry[]];
+];
