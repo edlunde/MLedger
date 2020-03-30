@@ -56,6 +56,9 @@ AddTest[journalTests, "testCreateJournal",
   AssertEquals[Dataset, Head@journal];
   AssertEquals["1234", journal[1, "description"]];
  ];
+ 
+ (* Check ids are added *)
+ AssertTrue[And@@(KeyExistsQ[#, "id"] & /@ CreateJournal[{CreateJournalEntry[]}])];
 ];
 
 
@@ -99,3 +102,34 @@ AddTest[journalTests, "testIsJournalEntry",
  (* Extra values should be allowed *)
  AssertTrue[IsJournalEntry@<|CreateJournalEntry[], "extra key" -> "extra value"|>];
 ];
+
+
+(* ::Subsubsection:: *)
+(*Internal tests*)
+
+
+Begin["MLedger`Private`"];
+AddSuite[journalTests, journalTestsInternal]
+AddTest[journalTestsInternal, "testAddIDs",
+ AssertEquals[<|CreateJournalEntry[], "id"->28496656361855733621011000650886999167|>,
+  addID@CreateJournalEntry[]];
+ AssertEquals[<|CreateJournalEntry[], "id"->28496656361855733621011000650886999167|>,
+  addID@addID@CreateJournalEntry[]];
+  
+ AssertMessage[
+  addIDs::duplicate,
+  addIDs@Dataset@{CreateJournalEntry[], CreateJournalEntry[]}];
+  
+ AssertTrue[
+  And@@(KeyExistsQ[#, "id"] & /@ addIDs@Dataset[{CreateJournalEntry[]}])];
+ (* Check FITID is used when present *)
+ With[{entry = CreateJournalEntry[
+   {2003, 10, 14}, "Payroll Deposit - HOTEL", 694.81, 695.36, 
+    "testAccount", "USD", "Hotel", "FITID" -> 1234]},
+  AssertEquals[43520287855825489889128932694485169284, 
+   addID[KeyDrop[entry, "FITID"]]["id"]]; (* Without FITID *)
+  AssertEquals[189748608173027501958982806065933508219, 
+   addID[entry]["id"]]; (* With FITID *)
+ ];
+];
+End[];

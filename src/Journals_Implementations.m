@@ -7,8 +7,22 @@
 IsJournal[dataset_Dataset] := And@@(IsJournalEntry /@ dataset)
 IsJournal[___] := False
 
-CreateJournal[entries : {___?IsJournalEntry}] := Dataset[CreateJournalEntry /@ entries] 
+CreateJournal[entries : {___?IsJournalEntry}] := 
+ addIDs@Dataset[CreateJournalEntry /@ entries] 
 CreateJournal[] := CreateJournal[{}]
+
+addIDs::duplicate = "Warning! Duplicate entries in { \n`1` \n... }";
+addIDs[journal_?IsJournal] := (
+ If[Not@DuplicateFreeQ[Normal@journal], 
+  Message[addIDs::duplicate, ToString[Normal@journal[[ ;; 2]]]]];
+  addID /@ journal)
+ 
+addID[entry_?IsJournalEntry] := 
+ If[KeyExistsQ[entry, "id"], entry,
+  Append[entry, "id" -> 
+   Hash[If[KeyExistsQ[#], entry[#]] & /@ 
+    {"date", "description", "amount", "account", "FITID"},
+    "MD5"]]]
 
 
 CreateJournalEntry[] := CreateJournalEntry[{1, 1, 1}, "", 0., 0., "", "", ""]
