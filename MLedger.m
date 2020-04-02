@@ -158,7 +158,7 @@ BoAFilePattern = "stmt" ~~ ___ ~~ ".txt";
 
 
 importBoA[filename_String, account_String] := 
- handleBoALine[account] /@ extractTableBoA@Import[filename]
+ CreateJournal[handleBoALine[account] /@ extractTableBoA@Import[filename]]
  
 extractTableBoA[str_String] :=
  StringTrim /@ DeleteCases[StringSplit[#, "  "], ""] & /@ StringSplit[str, "\n"]
@@ -189,7 +189,7 @@ nordeaFilePattern = "export" ~~ ___ ~~ ".csv";
 
 
 importNordea[filename_String, account_String] := 
- handleNordeaLine[account] /@ Import[filename]
+ CreateJournal[handleNordeaLine[account] /@ Import[filename]]
  
 handleNordeaLine[account_String] := handleNordeaLine[#, account] &
 handleNordeaLine[

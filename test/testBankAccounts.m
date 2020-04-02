@@ -163,6 +163,7 @@ AddTest[BoATestsInternal, "testImportBoA",
  With[{filename = testFilesDir <> "stmt.txt"},
   AssertTrue[Length@FileNames[filename] > 0];
   With[{imported = importBoA[filename, "BoATestAcc"]},
+   AssertTrue[IsJournal@imported];
    AssertEquals[17, Length@imported];
    
    AssertEquals["2003-10-14", imported[[1, "date"]]];
@@ -178,7 +179,7 @@ AddTest[BoATestsInternal, "testImportBoA",
 End[];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Nordea*)
 
 
@@ -209,6 +210,7 @@ AddTest[nordeaTestsInternal, "testImportNordea",
  With[{filename = testFilesDir <> "export0.csv"},
   AssertTrue[Length@FileNames[filename] > 0];
   With[{imported = importNordea[filename, "nordeaTestAcc"]},
+   AssertTrue[IsJournal@imported];
    AssertEquals[17, Length@imported];
    
    AssertEquals["2003-10-14", imported[[1, "date"]]];
