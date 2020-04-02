@@ -4,6 +4,10 @@
 (*Journals*)
 
 
+(* ::Subsubsection::Closed:: *)
+(*Journal*)
+
+
 IsJournal[dataset_Dataset] := And@@(IsJournalEntry /@ dataset)
 IsJournal[___] := False
 
@@ -25,7 +29,12 @@ addID[entry_?IsJournalEntry] :=
     "MD5"]]]
 
 
-CreateJournalEntry[] := CreateJournalEntry[{1, 1, 1}, "", 0., 0., "", "", ""]
+(* ::Subsubsection::Closed:: *)
+(*JournalEntry*)
+
+
+CreateJournalEntry[] = CreateJournalEntry[{1, 1, 1}, "", 0., 0., "", "", ""];
+CreateJournalEntry[{}] = CreateJournalEntry[];
 CreateJournalEntry[date : {_Integer, _Integer, _Integer} | _String,
   description_String, amount_?NumberQ, balance_?NumberQ, account_String,
   currency_String, category_String : "", extra : (_ -> _)...] := <|
@@ -45,3 +54,17 @@ With[{journalKeys = Sort@Keys@CreateJournalEntry[]},
  IsJournalEntry[entry_Association] := Complement[journalKeys, Keys@entry] === {};
  IsJournalEntry[___] := False;
 ]
+
+
+(* ::Subsubsection::Closed:: *)
+(*SetCategories*)
+
+
+SetCategories::length = "Journal `1` and categories `2` not of equal length.";
+SetCategories[journalIn_?IsJournal, categories_List] /; If[
+  Length@journalIn === Length@categories, True,
+  Message[SetCategories::length, Short@journalIn, Short@categories]; False
+ ] :=
+ Module[{journal = Normal@journalIn}, 
+  journal[[All, "category"]] = categories;
+  Dataset@journal]

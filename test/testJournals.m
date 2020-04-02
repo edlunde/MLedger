@@ -3,24 +3,15 @@
 AddSuite[MLedgerTests, journalsTests];
 
 
-(*(* Make sure we get a clean list of bank accounts each test, 
-     and that any old accounts are restored*)
-Module[{accounts},
- AddTest[bankAccountsTests, "Set Up", 
-  accounts = GetBankAccounts[];
-  SetBankAccounts[{}];
- ];
- AddTest[bankAccountsTests, "Tear Down",
-  SetBankAccounts[accounts];
- ];
-]*)
-
-
 (* ::Subsection:: *)
 (*Test journal*)
 
 
 AddSuite[journalsTests, journalTests];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Journal*)
 
 
 AddTest[journalTests, "testIsJournal",
@@ -62,12 +53,20 @@ AddTest[journalTests, "testCreateJournal",
 ];
 
 
+(* ::Subsubsection::Closed:: *)
+(*JournalEntry*)
+
+
 AddTest[journalTests, "testCreateJournalEntry",
  AssertEquals[
   <|"date"->"1-01-01", "description"->"", "amount"->0.`, "balance"->0.`,
     "account"->"", "currency"->"", "category"->""|>,
   CreateJournalEntry[]];
-  
+ AssertEquals[
+  <|"date"->"1-01-01", "description"->"", "amount"->0.`, "balance"->0.`,
+    "account"->"", "currency"->"", "category"->""|>,
+  CreateJournalEntry[{}]];
+ 
  AssertEquals[
   <|"date"->"2003-10-14", "description"->"Payroll Deposit - HOTEL", 
     "amount"->694.81, "balance"->695.36,
@@ -104,7 +103,34 @@ AddTest[journalTests, "testIsJournalEntry",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
+(*SetCategories*)
+
+
+AddTest[journalTests, "testSetCategories",
+ With[{
+  journal = CreateJournal[ 
+   (* create blank entries but different amounts to avoid warning addIDs::duplicate *)
+    <|CreateJournalEntry[], "amount" -> RandomReal[]|> & /@ {{}, {},\[NonBreakingSpace]{}}],
+   categories = {"category1", "category2", "category3"}
+  },
+  AssertTrue[IsJournal@journal];
+  AssertEquals[Length@journal, Length@categories];
+  
+  AssertTrue[IsJournal@SetCategories[journal, categories]];
+  AssertEquals[categories, SetCategories[journal, categories][All, "category"] // Normal];
+  
+  (* Check equal length required *)
+  AssertMessage[SetCategories::length, SetCategories[journal, categories[[;;-2]]]];
+  Off[SetCategories::length];
+  AssertEquals[SetCategories, Head@SetCategories[journal, categories[[;;-2]]]];
+  AssertEquals[SetCategories, Head@SetCategories[journal[[;;-2]], categories]];
+  On[SetCategories::length];
+ ];
+];
+
+
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
