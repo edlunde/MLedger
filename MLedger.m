@@ -80,7 +80,17 @@ CreateJournalEntry[..., extra] appends extra information. Has to be given as\
 
 SetCategories::usage = "SetCategories[journal, categories] takes a journal and a list \
 of categories with equal length and sets the \"category\"-field of the journal's \
-entries to the given categories."
+entries to the given categories.";
+
+
+(* ::Subsection::Closed:: *)
+(*Journal file handling*)
+
+
+ReadJournal::usage = "";
+
+WriteToJournal::usage = "WriteToJournal[journal] adds the entries from the journal \
+to the existing journal file in Journals/accountName/year.csv.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -209,7 +219,7 @@ handleNordeaLine[
 (* ::Package:: *)
 
 (* ::Subsection::Closed:: *)
-(*Journals*)
+(*Journal objects*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -276,6 +286,26 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
  Module[{journal = Normal@journalIn}, 
   journal[[All, "category"]] = categories;
   Dataset@journal]
+
+
+(* ::Subsection::Closed:: *)
+(*Journal file handling*)
+
+
+ReadJournal[filename_String] /; If[
+ FileExistsQ@filename, True,
+ Message[Import::nffil]; False
+ ] := CreateJournal@importCSV[filename]
+ 
+importCSV[filename_String] :=
+ With[{imported = Import[filename]},
+  AssociationThread[
+   First@imported (* First row is header*) -> #] & /@ Rest@imported
+ ]
+
+
+WriteToJournal[filename_String, journal_?IsJournal] :=1
+ Export[filename, journal]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

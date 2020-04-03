@@ -19,4 +19,14 @@ CreateJournalEntry[..., extra] appends extra information. Has to be given as\
 
 SetCategories::usage = "SetCategories[journal, categories] takes a journal and a list \
 of categories with equal length and sets the \"category\"-field of the journal's \
-entries to the given categories."
+entries to the given categories.";
+
+
+(* ::Subsection:: *)
+(*Journal file handling*)
+
+
+ReadJournal::usage = "";
+
+WriteToJournal::usage = "WriteToJournal[journal] adds the entries from the journal \
+to the existing journal file in Journals/accountName/year.csv.";

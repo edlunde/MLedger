@@ -1,10 +1,10 @@
 (* ::Package:: *)
 
 (* ::Subsection:: *)
-(*Journals*)
+(*Journal objects*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Journal*)
 
 
@@ -68,3 +68,23 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
  Module[{journal = Normal@journalIn}, 
   journal[[All, "category"]] = categories;
   Dataset@journal]
+
+
+(* ::Subsection:: *)
+(*Journal file handling*)
+
+
+ReadJournal[filename_String] /; If[
+ FileExistsQ@filename, True,
+ Message[Import::nffil]; False
+ ] := CreateJournal@importCSV[filename]
+ 
+importCSV[filename_String] :=
+ With[{imported = Import[filename]},
+  AssociationThread[
+   First@imported (* First row is header*) -> #] & /@ Rest@imported
+ ]
+
+
+WriteToJournal[filename_String, journal_?IsJournal] :=
+ Export[filename, journal]
