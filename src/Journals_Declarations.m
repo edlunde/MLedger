@@ -26,6 +26,10 @@ entries to the given categories.";
 (*Journal file handling*)
 
 
+GetJournalDir::usage = "GetJournalDir[] returns the directory used for journals.";
+SetJournalDir::usage = "SetJournalDir[directory] sets the directory used for journals.";
+
+
 ReadJournal::usage = "";
 
 WriteToJournal::usage = "WriteToJournal[journal] adds the entries from the journal \

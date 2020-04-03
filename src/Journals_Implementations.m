@@ -74,17 +74,20 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
 (*Journal file handling*)
 
 
-ReadJournal[filename_String] /; If[
- FileExistsQ@filename, True,
- Message[Import::nffil]; False
- ] := CreateJournal@importCSV[filename]
+Module[{journalDir = ""},
+ SetJournalDir[dir_String] := journalDir = dir;
+ GetJournalDir[] := journalDir
+]
+
+
+readJournalFile[filename_String] := CreateJournal@importCSV[filename]
  
 importCSV[filename_String] :=
- With[{imported = Import[filename]},
+ With[{imported = Import[filename, "CSV"]},
   AssociationThread[
    First@imported (* First row is header*) -> #] & /@ Rest@imported
  ]
 
 
-WriteToJournal[filename_String, journal_?IsJournal] :=
+writeToJournalFile[filename_String, journal_?IsJournal] :=
  Export[filename, journal]
