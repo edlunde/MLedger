@@ -81,10 +81,15 @@ Module[{journalDir = ""},
 
 
 ReadJournal[journal_?IsJournal] := 
- (* If journal is with mixed years/accounts, will give readJournalFile[False] *)
- readJournalFile[getJournalFilename@journal]
+ (* If journal is with mixed years/accounts, will give ReadJournal[___, False, ___] *)
+ ReadJournal[getJournalAccount@journal, getJournalYear@journal]
 ReadJournal[account_String, year_Integer] := 
- readJournalFile[FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]]
+ With[{filename = FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]},
+  If[FileExistsQ@filename,
+   readJournalFile[filename],
+   CreateJournal[]
+   ]
+ ]
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
  
@@ -98,10 +103,11 @@ importCSV[filename_String] :=
 WriteToJournal[journal_?IsJournal] := 
  (writeToJournalSingleFile /@ splitJournalByYear[#]) & /@ splitJournalByAccount@journal
 
-writeToJournalSingleFile[journal_?IsJournal] := (
- ensureJournalDirectoriesExists@journal;
- Export[getJournalFilename@journal, journal]
- )
+writeToJournalSingleFile[journalIn_?IsJournal] := 
+ With[{journal = mergeJournals[journalIn, ReadJournal[journalIn]]},
+  ensureJournalDirectoriesExists@journal;
+  Export[getJournalFilename@journal, journal]
+ ]
 
 
 getJournalFilename[journal_?IsJournal] := 
@@ -140,7 +146,8 @@ splitJournalByAccount[journal_?IsJournal] :=
  ClearAll@splitJournalByYear
 splitJournalByYear[journal_?IsJournal] := 
  CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]
- 
+
+
 mergeJournals[journal1_?IsJournal, journal2_?IsJournal] :=
  CreateJournal@sortByDateDescending[
   DeleteDuplicatesBy[#["id"]&][Join@@(Normal /@ {journal1, journal2})]
