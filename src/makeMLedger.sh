@@ -9,7 +9,7 @@ targetFile=$(dirname "${scriptDir}")/MLedger.m
 
 
 # Array with name stems for source files in desired order
-srcNames=("Common" "BankAccounts" "Journals")
+srcNames=("Common" "BankAccounts" "Journals" "Categorization")
 
 
 ##### Glue everything together

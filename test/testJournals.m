@@ -161,7 +161,7 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test journal file handling*)
 
 
@@ -196,7 +196,7 @@ AddTest[journalFileHandlingTests, "testGetSetJournalDir",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Read/WriteToJournal*)
 
 
@@ -254,13 +254,12 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
 Begin["MLedger`Private`"];
 AddSuite[journalFileHandlingTests, journalFileHandlingTestsInternal];
-
 
 AddTest[journalFileHandlingTestsInternal, "testGetJournalYear",
  AssertEquals[2003, getJournalYear@exampleJournal];

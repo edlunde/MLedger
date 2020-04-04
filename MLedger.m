@@ -111,6 +111,15 @@ will instead give ReadJournal[___, False, ___]";
 WriteToJournal::usage = "WriteToJournal[journal] splits the journal by account \
 and year and adds the entries to the existing journal file in \
 Journals/accountName/year.csv.";
+(* ::Section:: *)
+(*Categorization*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Categorization form*)
+
+
+CategorizationForm::usage = "";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -407,6 +416,12 @@ mergeJournals[journal1_?IsJournal, journal2_?IsJournal] :=
   ]
 sortByDateDescending[list_] :=
  Reverse@SortBy[DateList[#[["date"]]]&]@list
+(* ::Section:: *)
+(*Categorization*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Categorization form*)
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

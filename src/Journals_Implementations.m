@@ -4,7 +4,7 @@
 (*Journal objects*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Journal*)
 
 
@@ -29,7 +29,7 @@ addID[entry_?IsJournalEntry] :=
     "MD5"]]]
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*JournalEntry*)
 
 

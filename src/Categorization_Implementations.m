@@ -1,0 +1,4 @@
+(* ::Package:: *)
+
+(* ::Subsection:: *)
+(*Categorization form*)
