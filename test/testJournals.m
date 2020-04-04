@@ -178,7 +178,7 @@ AddTest[journalFileHandlingTests, "Set Up",
  exampleJournal2[[;; ;; 2, "date"]] = 
   StringReplace[#, "2003" -> "2004"]& /@ exampleJournal2[[;; ;; 2, "date"]];
  exampleJournal2[[;; ;; 3, "account"]] = "BoA Savings";
- exampleJournal2 = CreateJournal@exampleJournal2;
+ exampleJournal2 = CreateJournal[KeyDrop["id"] /@ exampleJournal2];
 ];
 
 AddTest[journalFileHandlingTests, "Tear Down", 
@@ -220,6 +220,7 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
  
  AssertTrue[Not@FileExistsQ[GetJournalDir[] <> "BoA Checking/2003.csv"]];
  WriteToJournal[exampleJournal2];
+ (* Check properly split by account and year *)
  AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Checking/2003.csv"]];
  AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Checking/2004.csv"]];
  AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Savings/2003.csv"]];
@@ -276,6 +277,18 @@ AddTest[journalFileHandlingTestsInternal, "testSplitJournalByYear",
   AssertEquals[2, Length@journals];
   AssertTrue[And @@ (IsJournal /@ journals)];
   AssertEquals[{2004, 2003}, getJournalYear /@ journals];
+ ];
+];
+
+AddTest[journalFileHandlingTestsInternal, "testMergeJournals",
+ With[{mergedJournal = mergeJournals[exampleJournal, exampleJournal2]},
+  AssertTrue[IsJournal@mergedJournal];
+  AssertEquals[29, Length@mergedJournal];
+  AssertTrue[DuplicateFreeQ@mergedJournal];
+  
+  (* Check sorted by date *)
+  AssertEquals[Normal@mergedJournal[All, "date"], 
+   Reverse@SortBy[DateList[#]&]@Normal@mergedJournal[All, "date"]]
  ];
 ];
 

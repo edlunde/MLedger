@@ -140,3 +140,10 @@ splitJournalByAccount[journal_?IsJournal] :=
  ClearAll@splitJournalByYear
 splitJournalByYear[journal_?IsJournal] := 
  CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]
+ 
+mergeJournals[journal1_?IsJournal, journal2_?IsJournal] :=
+ CreateJournal@sortByDateDescending[
+  DeleteDuplicatesBy[#["id"]&][Join@@(Normal /@ {journal1, journal2})]
+  ]
+sortByDateDescending[list_] :=
+ Reverse@SortBy[DateList[#[["date"]]]&]@list
