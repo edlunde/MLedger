@@ -318,6 +318,31 @@ WriteToJournal[journal_?IsJournal] :=
 
 writeToJournalFile[filename_String, journal_?IsJournal] :=
  Export[filename, journal]
+
+
+getJournalFilename[journal_?IsJournal] := 
+ With[{account = getJournalAccount@journal, year = getJournalYear@journal},
+  If[account === False || year === False,
+   False,
+   FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]
+   ]
+ ]
+ 
+getJournalAccount[journal_?IsJournal] :=
+ With[{accounts = Union[Normal@journal[All, "account"]]},
+  If[Length@accounts > 1, 
+   False,
+   First@accounts]
+ ]
+
+getJournalYear[journal_?IsJournal] :=
+ With[{years = Union[yearFromDateString /@ Normal@journal[All, "date"]]},
+  If[Length@years > 1, 
+   False,
+   First@years]
+ ]
+ 
+yearFromDateString[date_String] := First@DateList@date
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];
