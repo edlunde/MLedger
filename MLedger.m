@@ -102,10 +102,15 @@ GetJournalDir::usage = "GetJournalDir[] returns the directory used for journals.
 SetJournalDir::usage = "SetJournalDir[directory] sets the directory used for journals.";
 
 
-ReadJournal::usage = "";
+ReadJournal::usage = "ReadJournal[account, year] reads the journal for given year \
+and account.
+ReadJournal[journal] reads the saved journal with account and year corresponding to\[NonBreakingSpace]\
+those of the argument journal. If the latter is with mixed years/accounts, \
+will instead give readJournalFile[False]";
 
-WriteToJournal::usage = "WriteToJournal[journal] adds the entries from the journal \
-to the existing journal file in Journals/accountName/year.csv.";
+WriteToJournal::usage = "WriteToJournal[journal] splits the journal by account \
+and year and adds the entries to the existing journal file in \
+Journals/accountName/year.csv.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -323,6 +328,9 @@ Module[{journalDir = ""},
 ]
 
 
+ReadJournal[journal_?IsJournal] := 
+ (* If journal is with mixed years/accounts, will give readJournalFile[False] *)
+ readJournalFile[getJournalFilename@journal]
 ReadJournal[account_String, year_Integer] := 
  readJournalFile[FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]]
 
@@ -336,7 +344,7 @@ importCSV[filename_String] :=
 
 
 WriteToJournal[journal_?IsJournal] := 
- writeToJournalSingleFile[journal]
+ (writeToJournalSingleFile /@ splitJournalByYear[#]) & /@ splitJournalByAccount@journal
 
 writeToJournalSingleFile[journal_?IsJournal] := (
  ensureJournalDirectoriesExists@journal;
@@ -373,6 +381,13 @@ getJournalYear[journal_?IsJournal] :=
  ]
  
 yearFromDateString[date_String] := First@DateList@date
+
+
+splitJournalByAccount[journal_?IsJournal] := 
+ Function[acc, journal[Select[#account == acc &]]] /@ Normal@journal[Union, "account"]
+ ClearAll@splitJournalByYear
+splitJournalByYear[journal_?IsJournal] := 
+ CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

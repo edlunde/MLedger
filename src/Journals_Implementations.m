@@ -80,6 +80,9 @@ Module[{journalDir = ""},
 ]
 
 
+ReadJournal[journal_?IsJournal] := 
+ (* If journal is with mixed years/accounts, will give readJournalFile[False] *)
+ readJournalFile[getJournalFilename@journal]
 ReadJournal[account_String, year_Integer] := 
  readJournalFile[FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]]
 
@@ -93,7 +96,7 @@ importCSV[filename_String] :=
 
 
 WriteToJournal[journal_?IsJournal] := 
- writeToJournalSingleFile[journal]
+ (writeToJournalSingleFile /@ splitJournalByYear[#]) & /@ splitJournalByAccount@journal
 
 writeToJournalSingleFile[journal_?IsJournal] := (
  ensureJournalDirectoriesExists@journal;
@@ -130,3 +133,10 @@ getJournalYear[journal_?IsJournal] :=
  ]
  
 yearFromDateString[date_String] := First@DateList@date
+
+
+splitJournalByAccount[journal_?IsJournal] := 
+ Function[acc, journal[Select[#account == acc &]]] /@ Normal@journal[Union, "account"]
+ ClearAll@splitJournalByYear
+splitJournalByYear[journal_?IsJournal] := 
+ CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]

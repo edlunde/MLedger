@@ -30,7 +30,12 @@ GetJournalDir::usage = "GetJournalDir[] returns the directory used for journals.
 SetJournalDir::usage = "SetJournalDir[directory] sets the directory used for journals.";
 
 
-ReadJournal::usage = "";
+ReadJournal::usage = "ReadJournal[account, year] reads the journal for given year \
+and account.
+ReadJournal[journal] reads the saved journal with account and year corresponding to\[NonBreakingSpace]\
+those of the argument journal. If the latter is with mixed years/accounts, \
+will instead give readJournalFile[False]";
 
-WriteToJournal::usage = "WriteToJournal[journal] adds the entries from the journal \
-to the existing journal file in Journals/accountName/year.csv.";
+WriteToJournal::usage = "WriteToJournal[journal] splits the journal by account \
+and year and adds the entries to the existing journal file in \
+Journals/accountName/year.csv.";
