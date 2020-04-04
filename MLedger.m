@@ -302,6 +302,8 @@ Module[{journalDir = ""},
 ]
 
 
+ReadJournal[] := readJournalFile[GetJournalDir[] <> "temp.csv"]
+
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
  
 importCSV[filename_String] :=
@@ -310,6 +312,9 @@ importCSV[filename_String] :=
    First@imported (* First row is header*) -> #] & /@ Rest@imported
  ]
 
+
+WriteToJournal[journal_?IsJournal] := 
+ writeToJournalFile[GetJournalDir[] <> "temp.csv", journal]
 
 writeToJournalFile[filename_String, journal_?IsJournal] :=
  Export[filename, journal]
