@@ -8,8 +8,8 @@ scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 targetFile=$(dirname "${scriptDir}")/MLedger.m
 
 
-# Array with name stems for source files
-srcNames=("BankAccounts" "Journals")
+# Array with name stems for source files in desired order
+srcNames=("Common" "BankAccounts" "Journals")
 
 
 ##### Glue everything together

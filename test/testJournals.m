@@ -207,12 +207,8 @@ AddTest[journalFileHandlingTests, "testGetSetJournalDir",
 AddSuite[journalFileHandlingTests, readWriteJournalTests];
 
 
-ensureDirectoryExists[dir_String] := 
- If[Length@FileNames[dir] == 0, CreateDirectory[dir]]
-
-
 AddTest[readWriteJournalTests, "Set Up", 
- ensureDirectoryExists[testDirTemp];
+ EnsureDirectoryExists[testDirTemp];
 ];
 
 AddTest[readWriteJournalTests, "Tear Down", 
@@ -227,9 +223,9 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
  AssertMessage[Message[Import::nffil], ReadJournal[]]; (* Not working? *)
  
  WriteToJournal[exampleJournal];
- AssertTrue[FileExistsQ[GetJournalDir[] <> "temp.csv"]];
+ AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Checking/2003.csv"]];
  
- With[{journalRead = ReadJournal[]},
+ With[{journalRead = ReadJournal["BoA Checking", 2003]},
    AssertTrue[IsJournal@journalRead];
    AssertEquals[17, Length@journalRead];
    AssertEquals[Normal@exampleJournal, Normal@journalRead];

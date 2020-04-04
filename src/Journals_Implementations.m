@@ -80,22 +80,25 @@ Module[{journalDir = ""},
 ]
 
 
-ReadJournal[] := readJournalFile[GetJournalDir[] <> "temp.csv"]
+ReadJournal[account_String, year_Integer] := 
+ readJournalFile[FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]]
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
  
 importCSV[filename_String] :=
  With[{imported = Import[filename, "CSV"]},
   AssociationThread[
-   First@imported (* First row is header*) -> #] & /@ Rest@imported
+   First@imported (* First row is header *) -> #] & /@ Rest@imported
  ]
 
 
 WriteToJournal[journal_?IsJournal] := 
- writeToJournalFile[GetJournalDir[] <> "temp.csv", journal]
+ writeToJournalSingleFile[journal]
 
-writeToJournalFile[filename_String, journal_?IsJournal] :=
- Export[filename, journal]
+writeToJournalSingleFile[journal_?IsJournal] := (
+ ensureJournalDirectoriesExists@journal;
+ Export[getJournalFilename@journal, journal]
+ )
 
 
 getJournalFilename[journal_?IsJournal] := 
@@ -105,6 +108,12 @@ getJournalFilename[journal_?IsJournal] :=
    FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]
    ]
  ]
+
+(* Only indirectly tested *)
+ensureJournalDirectoriesExists[journal_?IsJournal] := 
+ ensureJournalDirectoriesExists[getJournalAccount@journal]
+ensureJournalDirectoriesExists[account_String] := 
+ EnsureDirectoryExists[GetJournalDir[] <> account <> "/"]
  
 getJournalAccount[journal_?IsJournal] :=
  With[{accounts = Union[Normal@journal[All, "account"]]},
