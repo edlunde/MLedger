@@ -14,6 +14,7 @@ Get[NotebookDirectory[]<>"setupAccounts.m"]
 
 
 setupBankAccounts[]
+SetJournalDir[NotebookDirectory[] <> "Journals/"]
 
 
 (* ::Subsection:: *)
@@ -25,3 +26,6 @@ importForm = SelectAccountsForm[
 
 
 imported = ImportAccountFiles[files, ExtractSelectedAccounts[importForm]]
+
+
+WriteToJournal /@ imported
