@@ -119,6 +119,13 @@ Begin["`Private`"];
 (* ::Package:: *)
 
 (* ::Subsection::Closed:: *)
+(*Dates*)
+
+
+toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
+
+
+(* ::Subsection::Closed:: *)
 (*Directory handling*)
 
 
@@ -291,8 +298,6 @@ CreateJournalEntry[date : {_Integer, _Integer, _Integer} | _String,
  "currency" -> currency, "category" -> category, extra
  |>
 CreateJournalEntry[journalEntry_?IsJournalEntry] := journalEntry
-
-toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
 
 
 (* Fixes journalKeys at time of reading in package, so any fancy redefinitions

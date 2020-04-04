@@ -4,6 +4,19 @@ AddSuite[MLedgerTests, commonTests];
 
 
 (* ::Subsection:: *)
+(*Test dates*)
+
+
+AddSuite[commonTests, datesTests];
+
+
+AddTest[datesTests, "testToDateString",
+ AssertEquals["2004-01-01", MLedger`Private`toDateString[{2004, 1, 1, 0, 0, 0}]];
+ AssertEquals["2004-01-01", MLedger`Private`toDateString["2004-01-01"]];
+];
+
+
+(* ::Subsection:: *)
 (*Test directory handling*)
 
 

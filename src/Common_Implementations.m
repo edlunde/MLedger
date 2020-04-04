@@ -1,6 +1,13 @@
 (* ::Package:: *)
 
 (* ::Subsection:: *)
+(*Dates*)
+
+
+toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
+
+
+(* ::Subsection:: *)
 (*Directory handling*)
 
 

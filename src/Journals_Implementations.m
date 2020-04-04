@@ -29,7 +29,7 @@ addID[entry_?IsJournalEntry] :=
     "MD5"]]]
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*JournalEntry*)
 
 
@@ -43,8 +43,6 @@ CreateJournalEntry[date : {_Integer, _Integer, _Integer} | _String,
  "currency" -> currency, "category" -> category, extra
  |>
 CreateJournalEntry[journalEntry_?IsJournalEntry] := journalEntry
-
-toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
 
 
 (* Fixes journalKeys at time of reading in package, so any fancy redefinitions
@@ -70,7 +68,7 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
   Dataset@journal]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Journal file handling*)
 
 
