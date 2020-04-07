@@ -19,18 +19,22 @@ AddTest[ledgerObjectTests, "Tear Down",
 ];
 
 
-(*AddTest[categorizationFormTests, "testCategorizationForm",
+AddTest[ledgerObjectTests, "testIsLedger",
+ AssertTrue[Not@IsLedger[1]];
+ AssertTrue[Not@IsLedger[{}]];
+ AssertTrue[Not@IsLedger[x]];
+ AssertTrue[IsLedger[Dataset@{}]];
+ AssertTrue[IsLedger[Dataset@{MLedger`Private`createLedgerLine[]}]];
+ AssertTrue[Not@IsLedger[Dataset@{Drop[#,1]&@MLedger`Private`createLedgerLine[]}]];
+];
+
+
+AddTest[ledgerObjectTests, "testCreateLedger",
  AssertTrue[IsJournal@exampleJournal];
- AssertEquals[17, Length@exampleJournal];
- With[{form = CategorizationForm@exampleJournal},
-  AssertEquals[Length@exampleJournal, Length@ExtractSelectedCategories@form];
-  AssertMatch[
-   Labeled[Grid[
-    {{__, PopupMenu[Dynamic[_], __],  InputField[Dynamic[_], String, __]}..}], ___],
-   form
-  ];
+ With[{ledger = CreateLedger@exampleJournal},
+  AssertTrue[IsLedger@ledger];
  ];
-];*)
+];
 
 
 (* ::Subsubsection:: *)

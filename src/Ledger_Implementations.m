@@ -5,6 +5,17 @@
 
 
 (* ::Subsubsection:: *)
+(*Ledger*)
+
+
+CreateLedger[journal_?IsJournal] := 
+ Dataset[Join@@(journalEntryToLedgerLines /@ Normal@journal)]
+ 
+IsLedger[dataset_Dataset] := And @@ (isLedgerLine /@ dataset)
+IsLedger[___] := False
+
+
+(* ::Subsubsection:: *)
 (*LedgerLine*)
 
 

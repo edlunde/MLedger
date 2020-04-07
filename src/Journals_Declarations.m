@@ -4,7 +4,7 @@
 (*Journal*)
 
 
-IsJournal::usage = "IsJournalEntry[obj_] returns True if obj is recognized \
+IsJournal::usage = "IsJournal[obj_] returns True if obj is recognized \
 as a Journal, False otherwise.";
 CreateJournal::usage = "CreateJournal[listOfJournalEntries] creates a Journal.";
 
