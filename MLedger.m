@@ -123,6 +123,16 @@ CategorizationForm::usage = "CategorizationForm[journal] sets up a form for fill
 out categories for a journal.";
 ExtractSelectedCategories::usage = "ExtractSelectedCategories[form] extracts the \
 chosen categories from a CategorizationForm.";
+(* ::Section:: *)
+(*Ledger*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Ledger object*)
+
+
+(*CategorizationForm::usage = "CategorizationForm[journal] sets up a form for filling \
+out categories for a journal.";*)
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -455,6 +465,61 @@ getCategories[entry_?IsJournalEntry] := {entry[["category"]]}
 
 ExtractSelectedCategories[categorizationForm_] :=
  Cases[categorizationForm, InputField[_[category_], __] :> category, All]
+(* ::Section:: *)
+(*Ledger*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Ledger object*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*LedgerLine*)
+
+
+createLedgerLine[] := createLedgerLine["2001-01-01", "", "", 0, "", "", 0]
+
+createLedgerLine[dateString_String,
+  account_String, debit_?numberOrEmptyStringQ, credit_?numberOrEmptyStringQ, 
+  currency_String, description_, id_Integer] :=
+ Association["date" -> dateString, "account" -> ToString@account, 
+  "debit" -> debit, "credit" -> credit, "currency" -> currency, 
+  "description" -> ToString@description, "id" -> id]
+
+numberOrEmptyStringQ[""] := True
+numberOrEmptyStringQ[x_] := NumberQ@x
+numberOrEmptyStringQ[___] := False
+
+
+With[{ledgerLineKeys = Sort@Keys@createLedgerLine[]},
+ isLedgerLine[entry_Association] := Complement[ledgerLineKeys, Keys@entry] === {};
+ isLedgerLine[___] := False;
+]
+
+
+journalEntryToLedgerLines[entry_?IsJournalEntry] := 
+ Module[{debit, credit, ledgerLines},
+  If[entry["amount"] > 0,
+   debit = entry["amount"]; credit = "";,
+   debit = ""; credit = Abs@entry["amount"];
+  ];
+  
+  ledgerLines = List@createLedgerLine[
+   entry["date"], entry["account"], debit, credit,
+   entry["currency"], entry["description"], entry["id"]
+   ];
+   
+  (* Entries with category "Internal" get only one ledger line, the matching line
+    should come from the other account involved. *)
+  If[entry["category"] != "Internal",
+   AppendTo[ledgerLines, 
+    createLedgerLine[
+     entry["date"], entry["category"], credit, debit,
+     entry["currency"], entry["description"], entry["id"]]]
+  ];
+  
+  ledgerLines
+]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];
