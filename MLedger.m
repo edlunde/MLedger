@@ -119,7 +119,10 @@ Journals/accountName/year.csv.";
 (*Categorization form*)
 
 
-CategorizationForm::usage = "";
+CategorizationForm::usage = "CategorizationForm[journal] sets up a form for filling \
+out categories for a journal.";
+ExtractSelectedCategories::usage = "ExtractSelectedCategories[form] extracts the \
+chosen categories from a CategorizationForm.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -424,6 +427,14 @@ sortByDateDescending[list_] :=
 (*Categorization form*)
 
 
+CategorizationForm[journal_?IsJournal] := 
+  addCategorizationFormHeader[journal[1, "account"],
+   Grid[categorizationFormRow /@ Normal@journal]
+  ]
+addCategorizationFormHeader[account_String, form_] :=
+ Labeled[form, Style[account, "Subsubsection"], {Top}]
+
+
 (* Note: not tested for Dynamic category-variable functionality 
    (most important part of course, but requires some arcane workaround to get right
    behavior when run without notebook?) *)
@@ -437,6 +448,13 @@ categorizationFormRow[entry_?IsJournalEntry] :=
    }
   ]
  ]
+ 
+(* Placeholder *)
+getCategories[entry_?IsJournalEntry] := {entry[["category"]]}
+
+
+ExtractSelectedCategories[categorizationForm_] :=
+ Cases[categorizationForm, InputField[_[category_], __] :> category, All]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];
