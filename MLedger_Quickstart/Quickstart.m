@@ -17,7 +17,7 @@ setupBankAccounts[]
 SetJournalDir[NotebookDirectory[] <> "Journals/"]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Importing from accounts*)
 
 
@@ -28,7 +28,8 @@ importForm = SelectAccountsForm[
 imported = ImportAccountFiles[files, ExtractSelectedAccounts[importForm]]
 
 
-WriteToJournal /@ imported
+readyToWrite = 0;
+If[readyToWrite == 1, WriteToJournal /@ imported]
 
 
 (* ::Subsection:: *)
@@ -40,3 +41,10 @@ form = CategorizationForm@journal
 
 
 categories = ExtractSelectedCategories[form]
+
+
+updatedJournal = SetCategories[journal, categories]
+
+
+readyToWrite = 0;
+If[readyToWrite == 1, WriteToJournal@updatedJournal]
