@@ -68,7 +68,7 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
   Dataset@journal]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Journal file handling*)
 
 
@@ -141,7 +141,7 @@ yearFromDateString[date_String] := First@DateList@date
 
 splitJournalByAccount[journal_?IsJournal] := 
  Function[acc, journal[Select[#account == acc &]]] /@ Normal@journal[Union, "account"]
- ClearAll@splitJournalByYear
+
 splitJournalByYear[journal_?IsJournal] := 
  CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]
 

@@ -3,7 +3,7 @@
 AddSuite[MLedgerTests, ledgerTests];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*ledgerTests setup/teardown*)
 
 
@@ -46,6 +46,14 @@ AddTest[ledgerObjectTests, "testCreateLedger",
   (* Check only one ledger entry from "Internal" journal entry *)
   AssertEquals[33, Length@ledgerWithInternalEntry]; 
   AssertEquals["", ledgerWithInternalEntry[3, "credit"]];
+ ];
+];
+
+AddTest[ledgerObjectTests, "testCreateLedgerFromLedgerLines",
+ With[{ledgerLines = Normal@CreateLedger@exampleJournal},
+  AssertMatch[{__?MLedger`Private`isLedgerLine}, ledgerLines];
+  AssertTrue[IsLedger@CreateLedger@ledgerLines];
+  AssertEquals[34, Length@CreateLedger@ledgerLines];
  ];
 ];
 
@@ -129,9 +137,19 @@ AddSuite[ledgerTests, ledgerFileHandlingTests];
 AddTest[ledgerFileHandlingTests, "Set Up", 
  testDirTemp = currentDir (* created in testScript.sh *) <> "testDirTemp642/";
  SetLedgerDir[testDirTemp];
+ exampleLedger = CreateLedger@exampleJournal;
+ 
+ exampleJournal2 = Normal@exampleJournal;
+ exampleJournal2[[;; ;; 2, "date"]] = 
+  StringReplace[#, "2003" -> "2004"]& /@ exampleJournal2[[;; ;; 2, "date"]];
+ exampleJournal2[[;; ;; 3, "account"]] = "BoA Savings";
+ (* add a few more changes in amounts *)
+ exampleJournal2[[;; 5, "amount"]] = 123;
+ exampleJournal2 = CreateJournal[KeyDrop["id"] /@ exampleJournal2];
+ exampleLedger2 = CreateLedger@exampleJournal2;
 ];
 AddTest[ledgerFileHandlingTests, "Tear Down", 
- ClearAll[testDirTemp];
+ ClearAll[testDirTemp, exampleLedger, exampleJournal2, exampleLedger2];
  SetLedgerDir[""];
 ];
 
@@ -141,3 +159,26 @@ AddTest[ledgerFileHandlingTests, "testGetSetLedgerDir",
  SetLedgerDir["dir"];
  AssertEquals["dir", GetLedgerDir[]];
 ];
+
+
+(* ::Subsubsection:: *)
+(*Internal tests*)
+
+
+(*Begin["MLedger`Private`"];
+AddSuite[ledgerFileHandlingTests, ledgerFileHandlingTestsInternal];
+
+AddTest[ledgerFileHandlingTestsInternal, "testSplitLedgerByMonthAndYear",
+ With[{ledgers = splitLedgerByMonthAndYear@exampleLedger},
+  AssertMatch[{__?IsLedger}, ledgers];
+  AssertEquals[2, Length@ledgers]; (* single year, two different months *)
+  (*AssertEquals[{"BoA Checking", "BoA Savings"}, getJournalAccount /@ ledgers];*)
+ ];
+ With[{ledgers = splitLedgerByMonthAndYear@exampleLedger2},
+  AssertMatch[{__?IsLedger}, ledgers];
+  AssertEquals[4, Length@ledgers]; (* two year, two months each *)
+  (*AssertEquals[{"BoA Checking", "BoA Savings"}, getJournalAccount /@ ledgers];*)
+ ];
+];
+
+End[]; (* End "MLedger`Private`" *)*)

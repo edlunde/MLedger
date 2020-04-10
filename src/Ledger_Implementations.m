@@ -1,15 +1,17 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Ledger object*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Ledger*)
 
 
 CreateLedger[journal_?IsJournal] := 
  Dataset[Join@@(journalEntryToLedgerLines /@ Normal@journal)]
+ 
+CreateLedger[ledgerLines : {__?isLedgerLine}] := Dataset@ledgerLines
  
 IsLedger[dataset_Dataset] := And @@ (isLedgerLine /@ dataset)
 IsLedger[___] := False
@@ -72,3 +74,9 @@ Module[{ledgerDir = ""},
  SetLedgerDir[dir_String] := ledgerDir = dir;
  GetLedgerDir[] := ledgerDir
 ]
+
+
+(*splitLedgerByMonthAndYear[ledger_?IsLedger] := 
+ (*CreateLedger /@ *)GatherBy[Normal@ledger, getYearAndMonth]
+getYearAndMonth[ledgerLine_?isLedgerLine] :=
+ DateList[ledgerLine[["date"]]][[;;2]]*)

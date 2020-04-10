@@ -427,7 +427,7 @@ yearFromDateString[date_String] := First@DateList@date
 
 splitJournalByAccount[journal_?IsJournal] := 
  Function[acc, journal[Select[#account == acc &]]] /@ Normal@journal[Union, "account"]
- ClearAll@splitJournalByYear
+
 splitJournalByYear[journal_?IsJournal] := 
  CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]
 
@@ -488,6 +488,8 @@ ExtractSelectedCategories[categorizationForm_] :=
 
 CreateLedger[journal_?IsJournal] := 
  Dataset[Join@@(journalEntryToLedgerLines /@ Normal@journal)]
+ 
+CreateLedger[ledgerLines : {__?isLedgerLine}] := Dataset@ledgerLines
  
 IsLedger[dataset_Dataset] := And @@ (isLedgerLine /@ dataset)
 IsLedger[___] := False
@@ -550,6 +552,12 @@ Module[{ledgerDir = ""},
  SetLedgerDir[dir_String] := ledgerDir = dir;
  GetLedgerDir[] := ledgerDir
 ]
+
+
+(*splitLedgerByMonthAndYear[ledger_?IsLedger] := 
+ (*CreateLedger /@ *)GatherBy[Normal@ledger, getYearAndMonth]
+getYearAndMonth[ledgerLine_?isLedgerLine] :=
+ DateList[ledgerLine[["date"]]][[;;2]]*)
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];
