@@ -554,10 +554,10 @@ Module[{ledgerDir = ""},
 ]
 
 
-(*splitLedgerByMonthAndYear[ledger_?IsLedger] := 
- (*CreateLedger /@ *)GatherBy[Normal@ledger, getYearAndMonth]
+splitLedgerByMonthAndYear[ledger_?IsLedger] := 
+ CreateLedger /@ GatherBy[Normal@ledger, getYearAndMonth]
 getYearAndMonth[ledgerLine_?isLedgerLine] :=
- DateList[ledgerLine[["date"]]][[;;2]]*)
+ DateList[ledgerLine[["date"]]][[;;2]]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

@@ -16,7 +16,7 @@ AddTest[ledgerTests, "Tear Down",
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test ledger object*)
 
 
@@ -58,7 +58,7 @@ AddTest[ledgerObjectTests, "testCreateLedgerFromLedgerLines",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
@@ -165,7 +165,7 @@ AddTest[ledgerFileHandlingTests, "testGetSetLedgerDir",
 (*Internal tests*)
 
 
-(*Begin["MLedger`Private`"];
+Begin["MLedger`Private`"];
 AddSuite[ledgerFileHandlingTests, ledgerFileHandlingTestsInternal];
 
 AddTest[ledgerFileHandlingTestsInternal, "testSplitLedgerByMonthAndYear",
@@ -181,4 +181,4 @@ AddTest[ledgerFileHandlingTestsInternal, "testSplitLedgerByMonthAndYear",
  ];
 ];
 
-End[]; (* End "MLedger`Private`" *)*)
+End[]; (* End "MLedger`Private`" *)
