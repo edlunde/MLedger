@@ -33,6 +33,15 @@ AddTest[ledgerObjectTests, "testCreateLedger",
  AssertTrue[IsJournal@exampleJournal];
  With[{ledger = CreateLedger@exampleJournal},
   AssertTrue[IsLedger@ledger];
+  AssertEquals[34, Length@ledger];
+  AssertEquals[5., ledger[3, "credit"]];
+ ];
+ With[{ledgerWithInternalEntry = 
+          CreateLedger@MapAt["Internal" &, exampleJournal, {1, "category"}]},
+  AssertTrue[IsLedger@ledgerWithInternalEntry];
+  (* Check only one ledger entry from "Internal" journal entry *)
+  AssertEquals[33, Length@ledgerWithInternalEntry]; 
+  AssertEquals["", ledgerWithInternalEntry[3, "credit"]];
  ];
 ];
 
