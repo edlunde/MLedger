@@ -1,10 +1,10 @@
 (* ::Package:: *)
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Ledger object*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Ledger*)
 
 
@@ -76,7 +76,36 @@ Module[{ledgerDir = ""},
 ]
 
 
+ReadLedger[year_Integer, month_Integer] := {}
+
+
+WriteToLedger[ledger_?IsLedger] := 
+ writeToLedgerSingleFile /@ splitLedgerByMonthAndYear@ledger
+ 
+writeToLedgerSingleFile[ledger_?IsLedger] := (
+ ensureLedgerDirectoriesExists@ledger;
+ Export[getLedgerFilename@ledger, ledger])
+
+
 splitLedgerByMonthAndYear[ledger_?IsLedger] := 
  CreateLedger /@ GatherBy[Normal@ledger, getYearAndMonth]
 getYearAndMonth[ledgerLine_?isLedgerLine] :=
  DateList[ledgerLine[["date"]]][[;;2]]
+
+
+getLedgerFilename[ledger_?IsLedger] :=
+ With[{yearMonthPairs = Union[getYearAndMonth /@ Normal@ledger]},
+  If[Length@yearMonthPairs == 1,
+   FileNameJoin[
+    {GetLedgerDir[], 
+     DateString[First@yearMonthPairs, {"Year", $PathnameSeparator, "MonthName"}]
+      <> ".csv"}],
+   False
+  ]
+ ]
+
+
+ensureLedgerDirectoriesExists[ledger_?IsLedger] := 
+ EnsureDirectoryExists[
+  FileNameDrop[getLedgerFilename@ledger, -1] <> $PathnameSeparator
+  ]

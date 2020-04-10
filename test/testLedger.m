@@ -16,46 +16,11 @@ AddTest[ledgerTests, "Tear Down",
 ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test ledger object*)
 
 
 AddSuite[ledgerTests, ledgerObjectTests];
-
-
-AddTest[ledgerObjectTests, "testIsLedger",
- AssertTrue[Not@IsLedger[1]];
- AssertTrue[Not@IsLedger[{}]];
- AssertTrue[Not@IsLedger[x]];
- AssertTrue[IsLedger[Dataset@{}]];
- AssertTrue[IsLedger[Dataset@{MLedger`Private`createLedgerLine[]}]];
- AssertTrue[Not@IsLedger[Dataset@{Drop[#,1]&@MLedger`Private`createLedgerLine[]}]];
-];
-
-
-AddTest[ledgerObjectTests, "testCreateLedger",
- AssertTrue[IsJournal@exampleJournal];
- With[{ledger = CreateLedger@exampleJournal},
-  AssertTrue[IsLedger@ledger];
-  AssertEquals[34, Length@ledger];
-  AssertEquals[5., ledger[3, "credit"]];
- ];
- With[{ledgerWithInternalEntry = 
-          CreateLedger@MapAt["Internal" &, exampleJournal, {1, "category"}]},
-  AssertTrue[IsLedger@ledgerWithInternalEntry];
-  (* Check only one ledger entry from "Internal" journal entry *)
-  AssertEquals[33, Length@ledgerWithInternalEntry]; 
-  AssertEquals["", ledgerWithInternalEntry[3, "credit"]];
- ];
-];
-
-AddTest[ledgerObjectTests, "testCreateLedgerFromLedgerLines",
- With[{ledgerLines = Normal@CreateLedger@exampleJournal},
-  AssertMatch[{__?MLedger`Private`isLedgerLine}, ledgerLines];
-  AssertTrue[IsLedger@CreateLedger@ledgerLines];
-  AssertEquals[34, Length@CreateLedger@ledgerLines];
- ];
-];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -64,8 +29,8 @@ AddTest[ledgerObjectTests, "testCreateLedgerFromLedgerLines",
 
 Begin["MLedger`Private`"];
 AddSuite[ledgerObjectTests, ledgerObjectTestsInternal]
+
 AddTest[ledgerObjectTestsInternal, "testCreateLedgerLine",
- 
  AssertEquals[
    <|"date"->"2001-01-01", "account"->"", "debit"->"", "credit"->0,
      "currency"->"", "description"->"", "id"->0|>,
@@ -127,6 +92,45 @@ AddTest[ledgerObjectTestsInternal, "testJournalEntryToLedgerLines",
 End[]; (* End "MLedger`Private`" *)
 
 
+(* ::Subsubsection::Closed:: *)
+(*object tests*)
+
+
+AddTest[ledgerObjectTests, "testIsLedger",
+ AssertTrue[Not@IsLedger[1]];
+ AssertTrue[Not@IsLedger[{}]];
+ AssertTrue[Not@IsLedger[x]];
+ AssertTrue[IsLedger[Dataset@{}]];
+ AssertTrue[IsLedger[Dataset@{MLedger`Private`createLedgerLine[]}]];
+ AssertTrue[Not@IsLedger[Dataset@{Drop[#,1]&@MLedger`Private`createLedgerLine[]}]];
+];
+
+
+AddTest[ledgerObjectTests, "testCreateLedger",
+ AssertTrue[IsJournal@exampleJournal];
+ With[{ledger = CreateLedger@exampleJournal},
+  AssertTrue[IsLedger@ledger];
+  AssertEquals[34, Length@ledger];
+  AssertEquals[5., ledger[3, "credit"]];
+ ];
+ With[{ledgerWithInternalEntry = 
+          CreateLedger@MapAt["Internal" &, exampleJournal, {1, "category"}]},
+  AssertTrue[IsLedger@ledgerWithInternalEntry];
+  (* Check only one ledger entry from "Internal" journal entry *)
+  AssertEquals[33, Length@ledgerWithInternalEntry]; 
+  AssertEquals["", ledgerWithInternalEntry[3, "credit"]];
+ ];
+];
+
+AddTest[ledgerObjectTests, "testCreateLedgerFromLedgerLines",
+ With[{ledgerLines = Normal@CreateLedger@exampleJournal},
+  AssertMatch[{__?MLedger`Private`isLedgerLine}, ledgerLines];
+  AssertTrue[IsLedger@CreateLedger@ledgerLines];
+  AssertEquals[34, Length@CreateLedger@ledgerLines];
+ ];
+];
+
+
 (* ::Subsection:: *)
 (*Test ledger file handling*)
 
@@ -161,7 +165,7 @@ AddTest[ledgerFileHandlingTests, "testGetSetLedgerDir",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
@@ -169,11 +173,13 @@ Begin["MLedger`Private`"];
 AddSuite[ledgerFileHandlingTests, ledgerFileHandlingTestsInternal];
 
 AddTest[ledgerFileHandlingTestsInternal, "testSplitLedgerByMonthAndYear",
+ AssertTrue[IsLedger@exampleLedger];
  With[{ledgers = splitLedgerByMonthAndYear@exampleLedger},
   AssertMatch[{__?IsLedger}, ledgers];
   AssertEquals[2, Length@ledgers]; (* single year, two different months *)
   (*AssertEquals[{"BoA Checking", "BoA Savings"}, getJournalAccount /@ ledgers];*)
  ];
+ AssertTrue[IsLedger@exampleLedger2];
  With[{ledgers = splitLedgerByMonthAndYear@exampleLedger2},
   AssertMatch[{__?IsLedger}, ledgers];
   AssertEquals[4, Length@ledgers]; (* two year, two months each *)
@@ -181,4 +187,60 @@ AddTest[ledgerFileHandlingTestsInternal, "testSplitLedgerByMonthAndYear",
  ];
 ];
 
+AddTest[ledgerFileHandlingTestsInternal, "testGetLedgerFilename",
+ AssertTrue[IsLedger@exampleLedger];
+ AssertEquals[GetLedgerDir[] <> "2003/November.csv", 
+  getLedgerFilename@exampleLedger[[;;5]]];
+ AssertEquals[False, getLedgerFilename@exampleLedger2];
+];
+
 End[]; (* End "MLedger`Private`" *)
+
+
+(* ::Subsubsection:: *)
+(*Read/WriteToLedger*)
+
+
+(* ::Text:: *)
+(*Separate subsuite for tests needing setup/teardown of directories to avoid interacting with file system with rest of tests.*)
+
+
+AddSuite[ledgerFileHandlingTests, readWriteLedgerTests];
+
+
+AddTest[readWriteLedgerTests, "Set Up", 
+ EnsureDirectoryExists[testDirTemp];
+];
+
+AddTest[readWriteLedgerTests, "Tear Down", 
+ If[Length@FileNames[testDirTemp] > 0, 
+  DeleteDirectory[testDirTemp, DeleteContents->True]];
+];
+
+AddTest[readWriteLedgerTests, "testReadWriteLedger",
+ AssertTrue[FileExistsQ@GetLedgerDir[]];
+ AssertEquals[{}, Normal@ReadLedger[2003, 11]];
+ 
+ AssertTrue[Not@FileExistsQ[GetLedgerDir[] <> "2003/October.csv"]];
+ AssertTrue[IsLedger@exampleLedger2];
+ WriteToLedger[exampleLedger2];
+ (* Check properly split by account and year *)
+ AssertTrue[FileExistsQ[GetLedgerDir[] <> "2003/October.csv"]];
+ AssertTrue[FileExistsQ[GetLedgerDir[] <> "2003/November.csv"]];
+ AssertTrue[FileExistsQ[GetLedgerDir[] <> "2004/October.csv"]];
+ AssertTrue[FileExistsQ[GetLedgerDir[] <> "2004/November.csv"]];
+ (*
+ With[{ledgerRead = ReadLedger["BoA Savings", 2004]},
+   AssertTrue[IsLedger@ledgerRead];
+   AssertEquals[3, Length@ledgerRead];
+   AssertEquals["BoA Savings", Normal@ledgerRead[[1, "account"]]];
+   AssertEquals["2004-10-20", Normal@ledgerRead[[3, "date"]]];
+  ];
+ With[{ledgerRead = ReadLedger[exampleLedger2[[2;;2]]]},
+   AssertTrue[IsLedger@ledgerRead];
+   AssertEquals[5, Length@ledgerRead];
+   AssertEquals["BoA Checking", Normal@ledgerRead[[1, "account"]]];
+   AssertEquals["2003-10-27", Normal@ledgerRead[[3, "date"]]];
+  ];
+ *)
+];

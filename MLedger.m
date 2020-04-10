@@ -142,6 +142,14 @@ CreateLedger::usage = "CreateLedger[journal] creates a ledger from a journal.";
 
 GetLedgerDir::usage = "GetLedgerDir[] returns the directory used for ledgers.";
 SetLedgerDir::usage = "SetLedgerDir[directory] sets the directory used for ledgers.";
+
+
+ReadLedger::usage = "ReadLedger[year, month] reads the ledger for given year \
+and month.";
+
+WriteToLedger::usage = "WriteToLedger[ledger] splits the ledger by year \
+and month and adds the entries to the existing ledger file in \
+Ledgers/year/month.csv.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -554,10 +562,39 @@ Module[{ledgerDir = ""},
 ]
 
 
+ReadLedger[year_Integer, month_Integer] := {}
+
+
+WriteToLedger[ledger_?IsLedger] := 
+ writeToLedgerSingleFile /@ splitLedgerByMonthAndYear@ledger
+ 
+writeToLedgerSingleFile[ledger_?IsLedger] := (
+ ensureLedgerDirectoriesExists@ledger;
+ Export[getLedgerFilename@ledger, ledger])
+
+
 splitLedgerByMonthAndYear[ledger_?IsLedger] := 
  CreateLedger /@ GatherBy[Normal@ledger, getYearAndMonth]
 getYearAndMonth[ledgerLine_?isLedgerLine] :=
  DateList[ledgerLine[["date"]]][[;;2]]
+
+
+getLedgerFilename[ledger_?IsLedger] :=
+ With[{yearMonthPairs = Union[getYearAndMonth /@ Normal@ledger]},
+  If[Length@yearMonthPairs == 1,
+   FileNameJoin[
+    {GetLedgerDir[], 
+     DateString[First@yearMonthPairs, {"Year", $PathnameSeparator, "MonthName"}]
+      <> ".csv"}],
+   False
+  ]
+ ]
+
+
+ensureLedgerDirectoriesExists[ledger_?IsLedger] := 
+ EnsureDirectoryExists[
+  FileNameDrop[getLedgerFilename@ledger, -1] <> $PathnameSeparator
+  ]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];
