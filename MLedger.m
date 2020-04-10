@@ -134,6 +134,14 @@ chosen categories from a CategorizationForm.";
 IsLedger::usage = "IsLedger[obj_] returns True if obj is recognized \
 as a Ledger, False otherwise."
 CreateLedger::usage = "CreateLedger[journal] creates a ledger from a journal.";
+
+
+(* ::Subsection::Closed:: *)
+(*Ledger file handling*)
+
+
+GetLedgerDir::usage = "GetLedgerDir[] returns the directory used for ledgers.";
+SetLedgerDir::usage = "SetLedgerDir[directory] sets the directory used for ledgers.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -531,6 +539,16 @@ journalEntryToLedgerLines[entry_?IsJournalEntry] :=
   ];
   
   ledgerLines
+]
+
+
+(* ::Subsection::Closed:: *)
+(*Ledger file handling*)
+
+
+Module[{ledgerDir = ""},
+ SetLedgerDir[dir_String] := ledgerDir = dir;
+ GetLedgerDir[] := ledgerDir
 ]
 (* ::Section::Closed:: *)
 (*Tail*)

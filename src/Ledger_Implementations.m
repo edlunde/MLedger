@@ -4,7 +4,7 @@
 (*Ledger object*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Ledger*)
 
 
@@ -15,7 +15,7 @@ IsLedger[dataset_Dataset] := And @@ (isLedgerLine /@ dataset)
 IsLedger[___] := False
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*LedgerLine*)
 
 
@@ -61,4 +61,14 @@ journalEntryToLedgerLines[entry_?IsJournalEntry] :=
   ];
   
   ledgerLines
+]
+
+
+(* ::Subsection:: *)
+(*Ledger file handling*)
+
+
+Module[{ledgerDir = ""},
+ SetLedgerDir[dir_String] := ledgerDir = dir;
+ GetLedgerDir[] := ledgerDir
 ]
