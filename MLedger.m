@@ -498,7 +498,8 @@ ExtractSelectedCategories[categorizationForm_] :=
 CreateLedger[journal_?IsJournal] := 
  Dataset[Join@@(journalEntryToLedgerLines /@ Normal@journal)]
  
-CreateLedger[ledgerLines : {__?isLedgerLine}] := Dataset@ledgerLines
+CreateLedger[] := CreateLedger[{}]
+CreateLedger[ledgerLines : {___?isLedgerLine}] := Dataset@ledgerLines
  
 IsLedger[dataset_Dataset] := And @@ (isLedgerLine /@ dataset)
 IsLedger[___] := False
@@ -563,7 +564,15 @@ Module[{ledgerDir = ""},
 ]
 
 
-ReadLedger[year_Integer, month_Integer] := {}
+ReadLedger[year_Integer, month_Integer] := 
+ With[{filename = formatLedgerFilename[year, month]},
+  If[FileExistsQ@filename,
+   readLedgerFile[filename],
+   CreateLedger[]
+   ]
+ ]
+ 
+readLedgerFile[filename_String] := CreateLedger@importCSV[filename]
 
 
 WriteToLedger[ledger_?IsLedger] := 

@@ -107,6 +107,7 @@ AddTest[ledgerObjectTests, "testIsLedger",
 
 
 AddTest[ledgerObjectTests, "testCreateLedger",
+ AssertEquals[{}, Normal@CreateLedger[]];
  AssertTrue[IsJournal@exampleJournal];
  With[{ledger = CreateLedger@exampleJournal},
   AssertTrue[IsLedger@ledger];
@@ -165,7 +166,7 @@ AddTest[ledgerFileHandlingTests, "testGetSetLedgerDir",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
@@ -197,9 +198,6 @@ AddTest[ledgerFileHandlingTestsInternal, "testFormatLedgerFilename",
 ];
 
 End[]; (* End "MLedger`Private`" *)
-
-
-+
 
 
 (* ::Subsubsection:: *)
@@ -235,17 +233,11 @@ AddTest[readWriteLedgerTests, "testReadWriteLedger",
  AssertTrue[FileExistsQ[GetLedgerDir[] <> "2004/October.csv"]];
  AssertTrue[FileExistsQ[GetLedgerDir[] <> "2004/November.csv"]];
  
-(*With[{ledgerRead = ReadLedger[2003, 11]},
+ With[{ledgerRead = ReadLedger[2003, 11]},
    AssertTrue[IsLedger@ledgerRead];
-   AssertEquals[3, Length@ledgerRead];
-   AssertEquals["BoA Savings", Normal@ledgerRead[[1, "account"]]];
-   AssertEquals["2004-10-20", Normal@ledgerRead[[3, "date"]]];
-  ];*)
- (*With[{ledgerRead = ReadLedger[exampleLedger2[[2;;2]]]},
-   AssertTrue[IsLedger@ledgerRead];
-   AssertEquals[5, Length@ledgerRead];
+   AssertEquals[4, Length@ledgerRead];
    AssertEquals["BoA Checking", Normal@ledgerRead[[1, "account"]]];
-   AssertEquals["2003-10-27", Normal@ledgerRead[[3, "date"]]];
+   AssertEquals["2003-11-03", Normal@ledgerRead[[3, "date"]]];
+   AssertEquals[123, Normal@ledgerRead[[4, "credit"]]];
   ];
- *)
 ];

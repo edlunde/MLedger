@@ -22,4 +22,4 @@ and month.";
 
 WriteToLedger::usage = "WriteToLedger[ledger] splits the ledger by year \
 and month and adds the entries to the existing ledger file in \
-Ledgers/year/month.csv.";
+GetLedgerDir[] <> /year/month.csv.";
