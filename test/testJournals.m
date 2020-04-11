@@ -161,7 +161,7 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test journal file handling*)
 
 
@@ -254,7 +254,7 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Internal tests*)
 
 
@@ -271,10 +271,10 @@ AddTest[journalFileHandlingTestsInternal, "testGetJournalAccount",
  AssertEquals[False, getJournalAccount@exampleJournal2];
 ];
 
-AddTest[journalFileHandlingTestsInternal, "testGetJournalFilename",
+AddTest[journalFileHandlingTestsInternal, "testFormatJournalFilename",
  AssertEquals[GetJournalDir[] <> "BoA Checking/2003.csv", 
-  getJournalFilename@exampleJournal];
- AssertEquals[False, getJournalFilename@exampleJournal2];
+  formatJournalFilename@exampleJournal];
+ AssertEquals[False, formatJournalFilename@exampleJournal2];
 ];
 
 AddTest[journalFileHandlingTestsInternal, "testSplitJournalByAccount",

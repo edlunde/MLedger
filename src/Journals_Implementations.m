@@ -82,7 +82,7 @@ ReadJournal[journal_?IsJournal] :=
  (* If journal is with mixed years/accounts, will give ReadJournal[___, False, ___] *)
  ReadJournal[getJournalAccount@journal, getJournalYear@journal]
 ReadJournal[account_String, year_Integer] := 
- With[{filename = FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]},
+ With[{filename = formatJournalFilename[account, year]},
   If[FileExistsQ@filename,
    readJournalFile[filename],
    CreateJournal[]
@@ -98,15 +98,17 @@ WriteToJournal[journal_?IsJournal] :=
 writeToJournalSingleFile[journalIn_?IsJournal] := 
  With[{journal = mergeJournals[journalIn, ReadJournal[journalIn]]},
   ensureJournalDirectoriesExists@journal;
-  Export[getJournalFilename@journal, journal]
+  Export[formatJournalFilename@journal, journal]
  ]
 
 
-getJournalFilename[journal_?IsJournal] := 
+formatJournalFilename[account_String, year_Integer] :=
+ FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]
+formatJournalFilename[journal_?IsJournal] := 
  With[{account = getJournalAccount@journal, year = getJournalYear@journal},
   If[account === False || year === False,
    False,
-   FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]
+   formatJournalFilename[account, year]
    ]
  ]
 
@@ -114,7 +116,7 @@ getJournalFilename[journal_?IsJournal] :=
 ensureJournalDirectoriesExists[journal_?IsJournal] := 
  ensureJournalDirectoriesExists[getJournalAccount@journal]
 ensureJournalDirectoriesExists[account_String] := 
- EnsureDirectoryExists[GetJournalDir[] <> account <> "/"]
+ EnsureDirectoryExists[GetJournalDir[] <> account <> $PathnameSeparator]
  
 getJournalAccount[journal_?IsJournal] :=
  With[{accounts = Union[Normal@journal[All, "account"]]},
