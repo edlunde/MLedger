@@ -306,6 +306,17 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
    AssertEquals["2004-10-24", Normal@journalRead[[3, "date"]]];
    AssertEquals["2003-10-27", Normal@journalRead[[-3, "date"]]];
   ];
+ 
+ (* ReadJournal[year], requires setting up accounts *)
+ SetBankAccounts[{<|"name" -> "BoA Checking"|>, <|"name" -> "BoA Savings"|>}];
+ With[{journalRead = ReadJournal[2003]},
+   AssertTrue[IsJournal@journalRead];
+   AssertEquals[8, Length@journalRead];
+   AssertEquals["BoA Checking", Normal@journalRead[[1, "account"]]];
+   AssertEquals["BoA Savings", Normal@journalRead[[2, "account"]]];
+   AssertEquals["2003-10-30", Normal@journalRead[[3, "date"]]];
+   AssertEquals["2003-10-21", Normal@journalRead[[-3, "date"]]];
+  ];
   
  (* Check writing into journal, not overwriting *)
  WriteToJournal[exampleJournal];
@@ -319,6 +330,7 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
 
 
 AddTest[readWriteJournalTests, "testListAccountsWithJournals",
+ SetBankAccounts[{}];
  AssertEquals[{}, ListAccountsWithJournals[]];
  
  AssertTrue[FileExistsQ@testDirTemp];

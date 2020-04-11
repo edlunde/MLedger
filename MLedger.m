@@ -106,7 +106,10 @@ ReadJournal::usage = "ReadJournal[account, year] reads the journal for given yea
 and account.
 ReadJournal[journal] reads the saved journal with account and year corresponding to\[NonBreakingSpace]\
 those of the argument journal. If the latter is with mixed years/accounts, \
-will instead give ReadJournal[___, False, ___]";
+will instead give ReadJournal[___, False, ___]. 
+
+ReadJournal[account] reads and merges all journals for all years for the given account.
+ReadJournal[year] reads and merges all journals for all accounts for the given year.";
 
 WriteToJournal::usage = "WriteToJournal[journal] splits the journal by account \
 and year and adds the entries to the existing journal file in \
@@ -410,8 +413,8 @@ ReadJournal[account_String, year_Integer] :=
 ReadJournal[account_String] :=
  mergeJournals[readJournalFile /@ 
   FileNames[journalFilenamePattern, formatJournalDirectory@account]]
-(*ReadJournal[year_Integer] :=
- mergeJournals[ReadJournal[#, year] & /@ ListAccountsWithJournals]*)
+ReadJournal[year_Integer] :=
+ mergeJournals[ReadJournal[#, year] & /@ ListAccountsWithJournals[]]
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
 

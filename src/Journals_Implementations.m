@@ -104,8 +104,8 @@ ReadJournal[account_String, year_Integer] :=
 ReadJournal[account_String] :=
  mergeJournals[readJournalFile /@ 
   FileNames[journalFilenamePattern, formatJournalDirectory@account]]
-(*ReadJournal[year_Integer] :=
- mergeJournals[ReadJournal[#, year] & /@ ListAccountsWithJournals]*)
+ReadJournal[year_Integer] :=
+ mergeJournals[ReadJournal[#, year] & /@ ListAccountsWithJournals[]]
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
 
