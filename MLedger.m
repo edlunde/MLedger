@@ -165,11 +165,18 @@ toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
 
 
 (* ::Subsection::Closed:: *)
-(*Directory handling*)
+(*File/Directory handling*)
 
 
 EnsureDirectoryExists[dir_String] := 
  If[Not@FileExistsQ@dir, CreateDirectory[dir]]
+
+
+importCSV[filename_String] :=
+ With[{imported = Import[filename, "CSV"]},
+  AssociationThread[
+   First@imported (* First row is header *) -> #] & /@ Rest@imported
+ ]
 (* ::Section:: *)
 (*BankAccounts*)
 (* ::Package:: *)
@@ -384,12 +391,6 @@ ReadJournal[account_String, year_Integer] :=
  ]
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
- 
-importCSV[filename_String] :=
- With[{imported = Import[filename, "CSV"]},
-  AssociationThread[
-   First@imported (* First row is header *) -> #] & /@ Rest@imported
- ]
 
 
 WriteToJournal[journal_?IsJournal] := 
@@ -570,7 +571,7 @@ WriteToLedger[ledger_?IsLedger] :=
  
 writeToLedgerSingleFile[ledger_?IsLedger] := (
  ensureLedgerDirectoriesExists@ledger;
- Export[getLedgerFilename@ledger, ledger])
+ Export[formatLedgerFilename@ledger, ledger])
 
 
 splitLedgerByMonthAndYear[ledger_?IsLedger] := 
@@ -579,22 +580,29 @@ getYearAndMonth[ledgerLine_?isLedgerLine] :=
  DateList[ledgerLine[["date"]]][[;;2]]
 
 
-getLedgerFilename[ledger_?IsLedger] :=
+formatLedgerDirectory[year_Integer] := 
+ FileNameJoin[{GetLedgerDir[], ToString@year}] <> $PathnameSeparator 
+formatLedgerFilename[year_Integer, month_Integer] := 
+ formatLedgerDirectory[year] <> DateString[{year, month}, {"MonthName"}] <> ".csv"
+ 
+formatLedgerDirectory[ledger_?IsLedger] :=
  With[{yearMonthPairs = Union[getYearAndMonth /@ Normal@ledger]},
   If[Length@yearMonthPairs == 1,
-   FileNameJoin[
-    {GetLedgerDir[], 
-     DateString[First@yearMonthPairs, {"Year", $PathnameSeparator, "MonthName"}]
-      <> ".csv"}],
+   formatLedgerDirectory[First@First@yearMonthPairs],
+   False
+  ]
+ ]
+formatLedgerFilename[ledger_?IsLedger] :=
+ With[{yearMonthPairs = Union[getYearAndMonth /@ Normal@ledger]},
+  If[Length@yearMonthPairs == 1,
+   formatLedgerFilename@@First@yearMonthPairs,
    False
   ]
  ]
 
 
 ensureLedgerDirectoriesExists[ledger_?IsLedger] := 
- EnsureDirectoryExists[
-  FileNameDrop[getLedgerFilename@ledger, -1] <> $PathnameSeparator
-  ]
+ EnsureDirectoryExists@formatLedgerDirectory@ledger
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

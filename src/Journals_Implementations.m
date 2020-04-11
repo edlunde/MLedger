@@ -90,12 +90,6 @@ ReadJournal[account_String, year_Integer] :=
  ]
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
- 
-importCSV[filename_String] :=
- With[{imported = Import[filename, "CSV"]},
-  AssociationThread[
-   First@imported (* First row is header *) -> #] & /@ Rest@imported
- ]
 
 
 WriteToJournal[journal_?IsJournal] := 
