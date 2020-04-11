@@ -39,3 +39,8 @@ will instead give ReadJournal[___, False, ___]";
 WriteToJournal::usage = "WriteToJournal[journal] splits the journal by account \
 and year and adds the entries to the existing journal file in \
 Journals/accountName/year.csv.";
+
+
+ListAccountsWithJournals::usage = "ListAccountsWithJournals[] lists the names of \
+accounts that have journal files. Gives a warning if it finds journals whose accounts \
+are not found by GetAccounts[].";

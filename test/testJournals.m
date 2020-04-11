@@ -197,64 +197,6 @@ AddTest[journalFileHandlingTests, "testGetSetJournalDir",
 
 
 (* ::Subsubsection::Closed:: *)
-(*Read/WriteToJournal*)
-
-
-(* ::Text:: *)
-(*Separate subsuite for tests needing setup/teardown of directories to avoid interacting with file system with rest of tests.*)
-
-
-AddSuite[journalFileHandlingTests, readWriteJournalTests];
-
-
-AddTest[readWriteJournalTests, "Set Up", 
- EnsureDirectoryExists[testDirTemp];
-];
-
-AddTest[readWriteJournalTests, "Tear Down", 
- If[Length@FileNames[testDirTemp] > 0, 
-  DeleteDirectory[testDirTemp, DeleteContents->True]];
-];
-
-AddTest[readWriteJournalTests, "testReadWriteJournal",
- AssertTrue[FileExistsQ@testDirTemp];
- AssertTrue[IsJournal@exampleJournal2];
- 
- AssertEquals[{}, Normal@ReadJournal["BoA Savings", 2004]];
- 
- AssertTrue[Not@FileExistsQ[GetJournalDir[] <> "BoA Checking/2003.csv"]];
- WriteToJournal[exampleJournal2];
- (* Check properly split by account and year *)
- AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Checking/2003.csv"]];
- AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Checking/2004.csv"]];
- AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Savings/2003.csv"]];
- AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Savings/2004.csv"]];
- 
- With[{journalRead = ReadJournal["BoA Savings", 2004]},
-   AssertTrue[IsJournal@journalRead];
-   AssertEquals[3, Length@journalRead];
-   AssertEquals["BoA Savings", Normal@journalRead[[1, "account"]]];
-   AssertEquals["2004-10-20", Normal@journalRead[[3, "date"]]];
-  ];
- With[{journalRead = ReadJournal[exampleJournal2[[2;;2]]]},
-   AssertTrue[IsJournal@journalRead];
-   AssertEquals[5, Length@journalRead];
-   AssertEquals["BoA Checking", Normal@journalRead[[1, "account"]]];
-   AssertEquals["2003-10-27", Normal@journalRead[[3, "date"]]];
-  ];
-  
- (* Check writing into journal, not overwriting *)
- WriteToJournal[exampleJournal];
- With[{journalRead = ReadJournal["BoA Checking", 2003]},
-  AssertTrue[IsJournal@journalRead];
-  AssertEquals[18, Length@journalRead];
-  AssertEquals["BoA Checking", Normal@journalRead[[1, "account"]]];
-  AssertEquals[{-5., 123}, Sort@Normal@journalRead[[;;2, "amount"]]];
- ];
-];
-
-
-(* ::Subsubsection:: *)
 (*Internal tests*)
 
 
@@ -305,3 +247,89 @@ AddTest[journalFileHandlingTestsInternal, "testMergeJournals",
 ];
 
 End[]; (* End "MLedger`Private`" *)
+
+
+(* ::Subsubsection:: *)
+(*Read/WriteToJournal*)
+
+
+(* ::Text:: *)
+(*Separate subsuite for tests needing setup/teardown of directories to avoid interacting with file system with rest of tests.*)
+
+
+AddSuite[journalFileHandlingTests, readWriteJournalTests];
+
+
+AddTest[readWriteJournalTests, "Set Up", 
+ EnsureDirectoryExists[testDirTemp];
+];
+
+AddTest[readWriteJournalTests, "Tear Down", 
+ If[Length@FileNames[testDirTemp] > 0, 
+  DeleteDirectory[testDirTemp, DeleteContents->True]];
+];
+
+
+AddTest[readWriteJournalTests, "testReadWriteJournal",
+ AssertTrue[FileExistsQ@testDirTemp];
+ AssertTrue[IsJournal@exampleJournal2];
+ 
+ AssertEquals[{}, Normal@ReadJournal["BoA Savings", 2004]];
+ 
+ AssertTrue[Not@FileExistsQ[GetJournalDir[] <> "BoA Checking/2003.csv"]];
+ WriteToJournal[exampleJournal2];
+ (* Check properly split by account and year *)
+ AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Checking/2003.csv"]];
+ AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Checking/2004.csv"]];
+ AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Savings/2003.csv"]];
+ AssertTrue[FileExistsQ[GetJournalDir[] <> "BoA Savings/2004.csv"]];
+ 
+ (* ReadJournal[account, year] *)
+ With[{journalRead = ReadJournal["BoA Savings", 2004]},
+   AssertTrue[IsJournal@journalRead];
+   AssertEquals[3, Length@journalRead];
+   AssertEquals["BoA Savings", Normal@journalRead[[1, "account"]]];
+   AssertEquals["2004-10-20", Normal@journalRead[[3, "date"]]];
+  ];
+ (* ReadJournal[journal] *)
+ With[{journalRead = ReadJournal[exampleJournal2[[2;;2]]]},
+   AssertTrue[IsJournal@journalRead];
+   AssertEquals[5, Length@journalRead];
+   AssertEquals["BoA Checking", Normal@journalRead[[1, "account"]]];
+   AssertEquals["2003-10-27", Normal@journalRead[[3, "date"]]];
+  ];
+ (* ReadJournal[account] *)
+ With[{journalRead = ReadJournal["BoA Checking"]},
+   AssertTrue[IsJournal@journalRead];
+   AssertEquals[11, Length@journalRead];
+   AssertEquals["BoA Checking", Normal@journalRead[[1, "account"]]];
+   AssertEquals["2004-10-24", Normal@journalRead[[3, "date"]]];
+   AssertEquals["2003-10-27", Normal@journalRead[[-3, "date"]]];
+  ];
+  
+ (* Check writing into journal, not overwriting *)
+ WriteToJournal[exampleJournal];
+ With[{journalRead = ReadJournal["BoA Checking", 2003]},
+  AssertTrue[IsJournal@journalRead];
+  AssertEquals[18, Length@journalRead];
+  AssertEquals["BoA Checking", Normal@journalRead[[1, "account"]]];
+  AssertEquals[{-5., 123}, Sort@Normal@journalRead[[;;2, "amount"]]];
+ ];
+];
+
+
+AddTest[readWriteJournalTests, "testListAccountsWithJournals",
+ AssertEquals[{}, ListAccountsWithJournals[]];
+ 
+ AssertTrue[FileExistsQ@testDirTemp];
+ AssertTrue[IsJournal@exampleJournal2];
+ WriteToJournal[exampleJournal2];
+ 
+ (* Check warning before accounts set up *)
+ AssertMessage[ListAccountsWithJournals::extraFiles, ListAccountsWithJournals[]];
+ AssertEquals[{}, 
+  Quiet[ListAccountsWithJournals[], ListAccountsWithJournals::extraFiles]];
+ 
+ SetBankAccounts[{<|"name" -> "BoA Checking"|>, <|"name" -> "BoA Savings"|>}];
+ AssertEquals[{"BoA Checking", "BoA Savings"}, Sort@ListAccountsWithJournals[]];
+];

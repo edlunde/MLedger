@@ -111,6 +111,11 @@ will instead give ReadJournal[___, False, ___]";
 WriteToJournal::usage = "WriteToJournal[journal] splits the journal by account \
 and year and adds the entries to the existing journal file in \
 Journals/accountName/year.csv.";
+
+
+ListAccountsWithJournals::usage = "ListAccountsWithJournals[] lists the names of \
+accounts that have journal files. Gives a warning if it finds journals whose accounts \
+are not found by GetAccounts[].";
 (* ::Section:: *)
 (*Categorization*)
 (* ::Package:: *)
@@ -379,6 +384,18 @@ Module[{journalDir = ""},
 ]
 
 
+ListAccountsWithJournals::extraFiles = "Warning: found files not recognized as beloning \
+to journals - `1`";
+ListAccountsWithJournals[] :=
+ With[{journalFolders = FileNameTake /@ FileNames[All, GetJournalDir[]]},
+  If[MemberQ[journalFolders, x_ /; Not@BankAccountNameQ@x],
+   Message[ListAccountsWithJournals::extraFiles, 
+    Select[journalFolders, Not@BankAccountNameQ@# &]]
+  ];
+  Select[journalFolders, BankAccountNameQ]
+ ]
+
+
 ReadJournal[journal_?IsJournal] := 
  (* If journal is with mixed years/accounts, will give ReadJournal[___, False, ___] *)
  ReadJournal[getJournalAccount@journal, getJournalYear@journal]
@@ -389,6 +406,12 @@ ReadJournal[account_String, year_Integer] :=
    CreateJournal[]
    ]
  ]
+ 
+ReadJournal[account_String] :=
+ mergeJournals[readJournalFile /@ 
+  FileNames[journalFilenamePattern, formatJournalDirectory@account]]
+(*ReadJournal[year_Integer] :=
+ mergeJournals[ReadJournal[#, year] & /@ ListAccountsWithJournals]*)
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
 
@@ -403,8 +426,10 @@ writeToJournalSingleFile[journalIn_?IsJournal] :=
  ]
 
 
+formatJournalDirectory[account_String] :=
+ GetJournalDir[] <> account <> $PathnameSeparator
 formatJournalFilename[account_String, year_Integer] :=
- FileNameJoin[{GetJournalDir[], account, ToString@year <> ".csv"}]
+ formatJournalDirectory@account <> ToString@year <> ".csv"
 formatJournalFilename[journal_?IsJournal] := 
  With[{account = getJournalAccount@journal, year = getJournalYear@journal},
   If[account === False || year === False,
@@ -412,12 +437,13 @@ formatJournalFilename[journal_?IsJournal] :=
    formatJournalFilename[account, year]
    ]
  ]
+journalFilenamePattern = NumberString ~~ ".csv"
 
 (* Only indirectly tested *)
 ensureJournalDirectoriesExists[journal_?IsJournal] := 
  ensureJournalDirectoriesExists[getJournalAccount@journal]
 ensureJournalDirectoriesExists[account_String] := 
- EnsureDirectoryExists[GetJournalDir[] <> account <> $PathnameSeparator]
+ EnsureDirectoryExists@formatJournalDirectory@account
  
 getJournalAccount[journal_?IsJournal] :=
  With[{accounts = Union[Normal@journal[All, "account"]]},
@@ -444,8 +470,10 @@ splitJournalByYear[journal_?IsJournal] :=
 
 
 mergeJournals[journal1_?IsJournal, journal2_?IsJournal] :=
+ mergeJournals[{journal1, journal2}]
+mergeJournals[journals : {__?IsJournal}] :=
  CreateJournal@sortByDateDescending[
-  DeleteDuplicatesBy[#["id"]&][Join@@(Normal /@ {journal1, journal2})]
+  DeleteDuplicatesBy[#["id"]&][Join@@(Normal /@ journals)]
   ]
 sortByDateDescending[list_] :=
  Reverse@SortBy[DateList[#[["date"]]]&]@list
