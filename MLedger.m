@@ -1,3 +1,8 @@
+(* ::Package:: *)
+
+(* ::Text:: *)
+(*Built and tested with WolframScript 1.2.0 for MacOSX-x86-64*)
+
 BeginPackage["MLedger`"];
 (* ::Chapter:: *)
 (*Declarations*)

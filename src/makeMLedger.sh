@@ -7,6 +7,7 @@ scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # We place the combined file one folder level up
 targetFile=$(dirname "${scriptDir}")/MLedger.m
 
+mathematicaVersion=$(/Applications/Mathematica.app/Contents/MacOS/MathematicaScript --version 2>&1)
 
 # Array with name stems for source files in desired order
 srcNames=("Common" "BankAccounts" "Journals" "Categorization" "Ledger")
@@ -14,7 +15,12 @@ srcNames=("Common" "BankAccounts" "Journals" "Categorization" "Ledger")
 
 ##### Glue everything together
 # Overwrite with >
-printf 'BeginPackage["MLedger`"];\n' > "${targetFile}"
+printf '(* ::Package:: *)\n\n' > "${targetFile}"
+
+# Add text cell with version tested on
+printf "(* ::Text:: *)\n(*Built and tested with ${mathematicaVersion}*)\n" >> "${targetFile}"
+
+printf '\nBeginPackage["MLedger`"];\n' >> "${targetFile}"
 
 
 printf '(* ::Chapter:: *)\n(*Declarations*)\n' >> "${targetFile}"
