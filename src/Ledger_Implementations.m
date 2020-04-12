@@ -4,7 +4,7 @@
 (*Ledger object*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Ledger*)
 
 
@@ -84,9 +84,12 @@ ReadLedger[year_Integer, month_Integer] :=
    CreateLedger[]
    ]
  ]
- 
+
 readLedgerFile[filename_String] := CreateLedger@importCSV[filename]
 
+
+WriteLedgerFromJournalFiles[year_Integer] :=
+ WriteToLedger@CreateLedger@ReadJournal[year]
 
 WriteToLedger[ledger_?IsLedger] := 
  writeToLedgerSingleFile /@ splitLedgerByMonthAndYear@ledger

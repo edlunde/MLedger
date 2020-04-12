@@ -163,6 +163,9 @@ and month.";
 WriteToLedger::usage = "WriteToLedger[ledger] splits the ledger by year \
 and month and adds the entries to the existing ledger file in \
 GetLedgerDir[] <> /year/month.csv.";
+WriteLedgerFromJournalFiles::usage = "WriteLedgerFromJournalFiles[year] reads \
+entries from all journals for the given year, creates corresponding ledger, and \
+writes to file.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -609,9 +612,12 @@ ReadLedger[year_Integer, month_Integer] :=
    CreateLedger[]
    ]
  ]
- 
+
 readLedgerFile[filename_String] := CreateLedger@importCSV[filename]
 
+
+WriteLedgerFromJournalFiles[year_Integer] :=
+ WriteToLedger@CreateLedger@ReadJournal[year]
 
 WriteToLedger[ledger_?IsLedger] := 
  writeToLedgerSingleFile /@ splitLedgerByMonthAndYear@ledger

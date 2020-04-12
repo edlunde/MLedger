@@ -15,6 +15,7 @@ Get[NotebookDirectory[]<>"setupAccounts.m"]
 
 setupBankAccounts[]
 SetJournalDir[NotebookDirectory[] <> "Journals/"]
+SetLedgerDir[NotebookDirectory[] <> "Ledger/"]
 
 
 (* ::Subsection:: *)
@@ -36,7 +37,7 @@ If[readyToWrite == 1, WriteToJournal /@ imported]
 (*Categorization*)
 
 
-journal = ReadJournal[GetBankAccounts[][[1, "name"]], 2003];
+journal = ReadJournal[GetBankAccounts[][[1, "name"]]];
 form = CategorizationForm@journal
 
 
@@ -48,3 +49,10 @@ updatedJournal = SetCategories[journal, categories]
 
 readyToWrite = 0;
 If[readyToWrite == 1, WriteToJournal@updatedJournal]
+
+
+(* ::Subsection:: *)
+(*Write to ledger*)
+
+
+WriteLedgerFromJournalFiles[2003]

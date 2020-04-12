@@ -220,6 +220,7 @@ AddTest[readWriteLedgerTests, "Tear Down",
   DeleteDirectory[testDirTemp, DeleteContents->True]];
 ];
 
+
 AddTest[readWriteLedgerTests, "testReadWriteLedger",
  AssertTrue[FileExistsQ@GetLedgerDir[]];
  AssertEquals[{}, Normal@ReadLedger[2003, 11]];
@@ -240,4 +241,33 @@ AddTest[readWriteLedgerTests, "testReadWriteLedger",
    AssertEquals["2003-11-03", Normal@ledgerRead[[3, "date"]]];
    AssertEquals[123, Normal@ledgerRead[[4, "credit"]]];
   ];
+];
+
+
+AddTest[readWriteLedgerTests, "WriteLedgerFromJournalFiles",
+ SetJournalDir[testDirTemp <> "Journal/"];
+ EnsureDirectoryExists[GetJournalDir[]];
+ AssertTrue[FileExistsQ@GetJournalDir[]];
+ AssertTrue[FileExistsQ@GetLedgerDir[]];
+ 
+ WriteToJournal[exampleJournal2];
+ AssertTrue[FileExistsQ@MLedger`Private`formatJournalFilename@exampleJournal2[[;;1]]];
+ With[{journal = ReadJournal[MLedger`Private`getJournalAccount@exampleJournal2[[;;1]]]},
+  AssertTrue[IsJournal@journal];
+  AssertEquals[6, Length@journal];
+ ];
+ 
+ AssertEquals[{}, Normal@ReadLedger[2003, 11]];
+ WriteLedgerFromJournalFiles[2003];
+ AssertEquals[{}, Normal@ReadLedger[2004, 11]];
+ AssertTrue[FileExistsQ[GetLedgerDir[] <> "2003/October.csv"]];
+ AssertTrue[FileExistsQ[GetLedgerDir[] <> "2003/November.csv"]];
+ 
+ With[{ledgerRead = ReadLedger[2003, 11]},
+  AssertTrue[IsLedger@ledgerRead];
+  AssertEquals[4, Length@ledgerRead];
+  AssertEquals["BoA Checking", Normal@ledgerRead[[1, "account"]]];
+  AssertEquals["2003-11-03", Normal@ledgerRead[[3, "date"]]];
+  AssertEquals[123, Normal@ledgerRead[[4, "credit"]]];
+ ];
 ];
