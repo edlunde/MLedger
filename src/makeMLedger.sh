@@ -10,7 +10,7 @@ targetFile=$(dirname "${scriptDir}")/MLedger.m
 mathematicaVersion=$(/Applications/Mathematica.app/Contents/MacOS/MathematicaScript --version 2>&1)
 
 # Array with name stems for source files in desired order
-srcNames=("Common" "BankAccounts" "Journals" "Categorization" "Ledger")
+srcNames=("Common" "BankAccounts" "Journals" "Categorization" "Ledger" "Balances")
 
 
 ##### Glue everything together

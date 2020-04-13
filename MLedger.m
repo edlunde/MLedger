@@ -166,6 +166,18 @@ GetLedgerDir[] <> /year/month.csv.";
 WriteLedgerFromJournalFiles::usage = "WriteLedgerFromJournalFiles[year] reads \
 entries from all journals for the given year, creates corresponding ledger, and \
 writes to file.";
+(* ::Section:: *)
+(*Balances*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Balances object*)
+
+
+IsBalances::usage = "IsBalances[obj] returns True if obj is recognized as a balances \
+object, false otherwise.";
+IsAccountBalances::usage = "IsAccountBalances[obj] returns True if obj is a list \
+of account balances, false otherwise.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -656,6 +668,21 @@ formatLedgerFilename[ledger_?IsLedger] :=
 
 ensureLedgerDirectoriesExists[ledger_?IsLedger] := 
  EnsureDirectoryExists@formatLedgerDirectory@ledger
+(* ::Section:: *)
+(*Balances*)
+(* ::Package:: *)
+
+
+
+
+IsBalances[obj_Association] := KeyExistsQ[obj, "date"] && 
+ KeyExistsQ[obj, "accountBalances"] && IsAccountBalances@obj["accountBalances"]
+IsBalances[___] := False
+
+With[{keys = {"account", "balance", "currency"}},
+ IsAccountBalances[lst : {__Association}] := And@@(Complement[keys, Keys@#] == {} & /@ lst)
+]
+IsAccountBalances[___] := False
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];
