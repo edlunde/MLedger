@@ -182,6 +182,12 @@ writes to file.";
 (*Balances object*)
 
 
+CreateBalancesObject::usage = "CreateBalancesObject[date, accountBalances] creates \
+a balances object with the given date and accountBalances.
+
+CreateBalancesObject[date, <|accountName -> balance, ...|>] creates a balances object \
+with balances for given accounts.";
+
 IsBalances::usage = "IsBalances[obj] returns True if obj is recognized as a balances \
 object, false otherwise.";
 IsAccountBalances::usage = "IsAccountBalances[obj] returns True if obj is a list \
@@ -688,11 +694,22 @@ ensureLedgerDirectoriesExists[ledger_?IsLedger] :=
 (*Balances*)
 (* ::Package:: *)
 
+CreateBalancesObject[date_String, accountBalances_?IsAccountBalances] :=
+ <|"date" -> date, "accountBalances" -> accountBalances|>
 
 
+CreateBalancesObject[date_String, assoc_?AssociationQ] /; 
+  SubsetQ[ListBankAccounts[], Keys[assoc]] && And@@(NumericQ /@ Values@assoc) :=
+ CreateBalancesObject[date,
+  JoinAcross[
+   Query[All, <| "account" -> "name", "currency" -> "currency"|>]@GetBankAccounts[],
+   KeyValueMap[<|"account" -> #1, "balance" -> #2|> & , assoc],
+   "account"]
+  ]
 
-IsBalances[obj_Association] := KeyExistsQ[obj, "date"] && 
- KeyExistsQ[obj, "accountBalances"] && IsAccountBalances@obj["accountBalances"]
+
+IsBalances[obj_Association] := HasKeysQ[obj, {"date", "accountBalances"}] && 
+ IsAccountBalances@obj["accountBalances"]
 IsBalances[___] := False
 
 With[{keys = {"account", "balance", "currency"}},
