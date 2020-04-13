@@ -8,6 +8,14 @@ toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
 
 
 (* ::Subsection:: *)
+(*Data structure functions*)
+
+
+HasKeysQ[assoc_ /; ListQ@assoc || AssociationQ@assoc , keys_] := 
+ And @@ (KeyExistsQ[assoc, #] & /@ keys)
+
+
+(* ::Subsection:: *)
 (*File/Directory handling*)
 
 

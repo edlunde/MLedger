@@ -8,6 +8,6 @@ IsBalances[obj_Association] := KeyExistsQ[obj, "date"] &&
 IsBalances[___] := False
 
 With[{keys = {"account", "balance", "currency"}},
- IsAccountBalances[lst : {__Association}] := And@@(Complement[keys, Keys@#] == {} & /@ lst)
+ IsAccountBalances[lst : {__Association}] := And@@(HasKeysQ[#, keys] & /@ lst)
 ]
 IsAccountBalances[___] := False

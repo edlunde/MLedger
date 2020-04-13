@@ -17,6 +17,14 @@ BeginPackage["MLedger`"];
 EnsureDirectoryExists::usage = 
  "EnsureDirectoryExists[dir] creates dir if it does not exist.";
 
+
+(* ::Subsection::Closed:: *)
+(*Data structure functions*)
+
+
+HasKeysQ::usage = 
+ "HasKeysQ[assoc, keys] returns True if every key in keys exists among the keys of\[NonBreakingSpace]\
+assoc. Also works if assoc is a list of rules.";
 (* ::Section:: *)
 (*BankAccounts*)
 (* ::Package:: *)
@@ -190,6 +198,14 @@ Begin["`Private`"];
 
 
 toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
+
+
+(* ::Subsection::Closed:: *)
+(*Data structure functions*)
+
+
+HasKeysQ[assoc_ /; ListQ@assoc || AssociationQ@assoc , keys_] := 
+ And @@ (KeyExistsQ[assoc, #] & /@ keys)
 
 
 (* ::Subsection::Closed:: *)
@@ -378,7 +394,7 @@ CreateJournalEntry[journalEntry_?IsJournalEntry] := journalEntry
     afterwards of what a JournalEntry should look like needs to redefine IsJournalEntry
     too. *)
 With[{journalKeys = Sort@Keys@CreateJournalEntry[]},
- IsJournalEntry[entry_Association] := Complement[journalKeys, Keys@entry] === {};
+ IsJournalEntry[entry_Association] := HasKeysQ[entry, journalKeys];
  IsJournalEntry[___] := False;
 ]
 
@@ -577,7 +593,7 @@ numberOrEmptyStringQ[___] := False
 
 
 With[{ledgerLineKeys = Sort@Keys@createLedgerLine[]},
- isLedgerLine[entry_Association] := Complement[ledgerLineKeys, Keys@entry] === {};
+ isLedgerLine[entry_Association] := HasKeysQ[entry, ledgerLineKeys];
  isLedgerLine[___] := False;
 ]
 
@@ -680,7 +696,7 @@ IsBalances[obj_Association] := KeyExistsQ[obj, "date"] &&
 IsBalances[___] := False
 
 With[{keys = {"account", "balance", "currency"}},
- IsAccountBalances[lst : {__Association}] := And@@(Complement[keys, Keys@#] == {} & /@ lst)
+ IsAccountBalances[lst : {__Association}] := And@@(HasKeysQ[#, keys] & /@ lst)
 ]
 IsAccountBalances[___] := False
 (* ::Section::Closed:: *)

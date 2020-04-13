@@ -29,7 +29,7 @@ addID[entry_?IsJournalEntry] :=
     "MD5"]]]
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*JournalEntry*)
 
 
@@ -49,7 +49,7 @@ CreateJournalEntry[journalEntry_?IsJournalEntry] := journalEntry
     afterwards of what a JournalEntry should look like needs to redefine IsJournalEntry
     too. *)
 With[{journalKeys = Sort@Keys@CreateJournalEntry[]},
- IsJournalEntry[entry_Association] := Complement[journalKeys, Keys@entry] === {};
+ IsJournalEntry[entry_Association] := HasKeysQ[entry, journalKeys];
  IsJournalEntry[___] := False;
 ]
 
@@ -68,7 +68,7 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
   Dataset@journal]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Journal file handling*)
 
 

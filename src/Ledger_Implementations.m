@@ -4,7 +4,7 @@
 (*Ledger object*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Ledger*)
 
 
@@ -18,7 +18,7 @@ IsLedger[dataset_Dataset] := And @@ (isLedgerLine /@ dataset)
 IsLedger[___] := False
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*LedgerLine*)
 
 
@@ -37,7 +37,7 @@ numberOrEmptyStringQ[___] := False
 
 
 With[{ledgerLineKeys = Sort@Keys@createLedgerLine[]},
- isLedgerLine[entry_Association] := Complement[ledgerLineKeys, Keys@entry] === {};
+ isLedgerLine[entry_Association] := HasKeysQ[entry, ledgerLineKeys];
  isLedgerLine[___] := False;
 ]
 
@@ -67,7 +67,7 @@ journalEntryToLedgerLines[entry_?IsJournalEntry] :=
 ]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Ledger file handling*)
 
 

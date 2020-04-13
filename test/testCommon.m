@@ -17,6 +17,28 @@ AddTest[datesTests, "testToDateString",
 
 
 (* ::Subsection:: *)
+(*Test data structure functions*)
+
+
+AddSuite[commonTests, dataStructTests];
+
+
+AddTest[dataStructTests, "testHasKeysQ",
+ Module[{keys = {"a", "b"}, assoc, list},
+  assoc = <| "a" -> 1, "b" -> 3, "c" -> 2 |>;
+  AssertTrue@HasKeysQ[assoc, keys];
+  assoc = <| "a" -> 1, "c" -> 2 |>;
+  AssertTrue@Not@HasKeysQ[assoc, keys];
+
+  list = {"a" -> 1,  "b" -> 3};
+  AssertTrue@HasKeysQ[list, keys];
+  list = {"a" -> 1, {"b", 3}};
+  AssertTrue@Not@HasKeysQ[list, keys];
+ ];
+];
+
+
+(* ::Subsection:: *)
 (*Test directory handling*)
 
 
