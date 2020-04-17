@@ -107,6 +107,9 @@ of categories with equal length and sets the \"category\"-field of the journal's
 entries to the given categories.";
 
 
+AddCalculatedBalances::usage = "";
+
+
 (* ::Subsection::Closed:: *)
 (*Journal file handling*)
 
@@ -431,6 +434,20 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
  Module[{journal = Normal@journalIn}, 
   journal[[All, "category"]] = categories;
   Dataset@journal]
+
+
+(* ::Subsubsection::Closed:: *)
+(*AddCalculatedBalances*)
+
+
+AddCalculatedBalances[journal_?IsJournal, incomingBalance_?NumericQ] :=
+ Insert[#, "calcBalance" -> 0., Position[Keys@#, "balance"] + 1] & /@ journal
+ 
+calculateBalances[journal_?IsJournal, incomingBalance_?NumericQ] := 
+ journal
+
+
+(*calculateBalances[journal,0.55]*)
 
 
 (* ::Subsection::Closed:: *)

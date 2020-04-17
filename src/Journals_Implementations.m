@@ -4,7 +4,7 @@
 (*Journal objects*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Journal*)
 
 
@@ -29,7 +29,7 @@ addID[entry_?IsJournalEntry] :=
     "MD5"]]]
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*JournalEntry*)
 
 
@@ -66,6 +66,20 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
  Module[{journal = Normal@journalIn}, 
   journal[[All, "category"]] = categories;
   Dataset@journal]
+
+
+(* ::Subsubsection:: *)
+(*AddCalculatedBalances*)
+
+
+AddCalculatedBalances[journal_?IsJournal, incomingBalance_?NumericQ] :=
+ Insert[#, "calcBalance" -> 0., Position[Keys@#, "balance"] + 1] & /@ journal
+ 
+calculateBalances[journal_?IsJournal, incomingBalance_?NumericQ] := 
+ journal
+
+
+(*calculateBalances[journal,0.55]*)
 
 
 (* ::Subsection::Closed:: *)

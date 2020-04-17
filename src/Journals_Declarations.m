@@ -22,6 +22,9 @@ of categories with equal length and sets the \"category\"-field of the journal's
 entries to the given categories.";
 
 
+AddCalculatedBalances::usage = "";
+
+
 (* ::Subsection:: *)
 (*Journal file handling*)
 
