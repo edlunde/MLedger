@@ -3,8 +3,8 @@
 AddSuite[MLedgerTests, balancesTests];
 
 
-(* ::Subsection:: *)
-(*Test balances object*)
+(* ::Subsection::Closed:: *)
+(*Test balances objects*)
 
 
 AddSuite[balancesTests, testBalancesObject];
@@ -55,4 +55,67 @@ AddTest[testBalancesObject, "testCreateBalancesObject",
  
  AssertTrue[KeyExistsQ[#, "date"] & @ CreateBalancesObject["1", <|"acc1" -> 1, "acc2" -> 3|>]];
  AssertTrue[KeyExistsQ[#, "accountBalances"] & @ CreateBalancesObject["1", <|"acc1" -> 1|>]];
+];
+
+
+(* ::Subsection:: *)
+(*Test balances file handling*)
+
+
+AddSuite[balancesTests, balancesFileHandlingTests];
+
+
+AddTest[balancesFileHandlingTests, "Set Up", 
+ testDirTemp = currentDir (* created in testScript.sh *) <> "testDirTemp642/";
+ SetBalancesDir[testDirTemp];
+ 
+ exampleBalances = CreateBalancesObject["2003-10-09", {<|"account"->"Example BoA account" ,"balance"->0.55,"currency"->"USD"|>,<|"account"->"Example Nordea account" ,"balance"->0.55,"currency"->"SEK" |>}];
+];
+
+AddTest[balancesFileHandlingTests, "Tear Down", 
+ ClearAll[testDirTemp, exampleBalances];
+ SetBalancesDir[""];
+];
+
+
+AddTest[balancesFileHandlingTests, "testGetSetBalancesDir",
+ AssertEquals[testDirTemp, GetBalancesDir[]];
+ SetBalancesDir["dir"];
+ AssertEquals["dir", GetBalancesDir[]];
+];
+
+
+(* ::Subsubsection:: *)
+(*Read/WriteToBalances*)
+
+
+AddSuite[balancesFileHandlingTests, readWriteBalancesTests];
+
+
+AddTest[readWriteBalancesTests, "Set Up", 
+ EnsureDirectoryExists[testDirTemp];
+];
+
+AddTest[readWriteBalancesTests, "Tear Down", 
+ If[Length@FileNames[testDirTemp] > 0, 
+  DeleteDirectory[testDirTemp, DeleteContents->True]];
+];
+
+
+AddTest[readWriteBalancesTests, "testReadWriteBalances",
+ AssertTrue[FileExistsQ@GetBalancesDir[]];
+ AssertTrue[IsBalances@exampleBalances];
+ 
+ AssertMessage[Import::nffil, ReadBalances[exampleBalances["date"]]];
+ 
+ AssertTrue[Not@FileExistsQ[GetBalancesDir[] <> exampleBalances["date"] <> ".csv"]];
+ WriteToBalances[exampleBalances];
+ AssertTrue[FileExistsQ[GetBalancesDir[] <> exampleBalances["date"] <> ".csv"]];
+ 
+ With[{balancesRead = ReadBalances[exampleBalances["date"]]},
+   AssertTrue[IsBalances@balancesRead];
+   AssertEquals[2, Length@balancesRead["accountBalances"]];
+   AssertEquals["Example BoA account", balancesRead[["accountBalances", 1, "account"]]];
+   AssertEquals[0.55, balancesRead[["accountBalances", 2, "balance"]]];
+  ];
 ];

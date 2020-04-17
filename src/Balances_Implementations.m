@@ -1,5 +1,9 @@
 (* ::Package:: *)
 
+(* ::Subsection:: *)
+(*Balances objects*)
+
+
 CreateBalancesObject[date_String, accountBalances_?IsAccountBalances] :=
  <|"date" -> date, "accountBalances" -> accountBalances|>
 
@@ -22,3 +26,25 @@ With[{keys = {"account", "balance", "currency"}},
  IsAccountBalances[lst : {__Association}] := And@@(HasKeysQ[#, keys] & /@ lst)
 ]
 IsAccountBalances[___] := False
+
+
+(* ::Subsection:: *)
+(*Balances file handling*)
+
+
+Module[{balancesDir = ""},
+ SetBalancesDir[dir_String] := balancesDir = dir;
+ GetBalancesDir[] := balancesDir
+]
+
+
+WriteToBalances[balances_?IsBalances] := 
+ Export[formatBalancesFilename@balances["date"], Dataset@balances["accountBalances"]]
+ 
+ReadBalances[date_String] /; 
+ If[FileExistsQ@formatBalancesFilename@date,
+  True,
+  Message[Import::nffil, formatBalancesFilename@date]; False] :=
+ CreateBalancesObject[date, importCSV[formatBalancesFilename@date]]
+ 
+formatBalancesFilename[date_String] := FileNameJoin[{GetBalancesDir[], date <> ".csv"}]

@@ -179,7 +179,7 @@ writes to file.";
 (* ::Package:: *)
 
 (* ::Subsection::Closed:: *)
-(*Balances object*)
+(*Balances objects*)
 
 
 CreateBalancesObject::usage = "CreateBalancesObject[date, accountBalances] creates \
@@ -192,6 +192,20 @@ IsBalances::usage = "IsBalances[obj] returns True if obj is recognized as a bala
 object, false otherwise.";
 IsAccountBalances::usage = "IsAccountBalances[obj] returns True if obj is a list \
 of account balances, false otherwise.";
+
+
+(* ::Subsection::Closed:: *)
+(*Balances file handling*)
+
+
+GetBalancesDir::usage = "GetBalancesDir[] returns the directory used for balances.";
+SetBalancesDir::usage = "SetBalancesDir[directory] sets the directory used for balances.";
+
+
+ReadBalances::usage = "ReadBalances[date] reads the balance file for the given date.";
+
+WriteToBalances::usage = "WriteToBalances[balances] writes the given balances object \
+to GetBalancesDir[]/date.csv";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -694,6 +708,10 @@ ensureLedgerDirectoriesExists[ledger_?IsLedger] :=
 (*Balances*)
 (* ::Package:: *)
 
+(* ::Subsection::Closed:: *)
+(*Balances objects*)
+
+
 CreateBalancesObject[date_String, accountBalances_?IsAccountBalances] :=
  <|"date" -> date, "accountBalances" -> accountBalances|>
 
@@ -716,6 +734,28 @@ With[{keys = {"account", "balance", "currency"}},
  IsAccountBalances[lst : {__Association}] := And@@(HasKeysQ[#, keys] & /@ lst)
 ]
 IsAccountBalances[___] := False
+
+
+(* ::Subsection::Closed:: *)
+(*Balances file handling*)
+
+
+Module[{balancesDir = ""},
+ SetBalancesDir[dir_String] := balancesDir = dir;
+ GetBalancesDir[] := balancesDir
+]
+
+
+WriteToBalances[balances_?IsBalances] := 
+ Export[formatBalancesFilename@balances["date"], Dataset@balances["accountBalances"]]
+ 
+ReadBalances[date_String] /; 
+ If[FileExistsQ@formatBalancesFilename@date,
+  True,
+  Message[Import::nffil, formatBalancesFilename@date]; False] :=
+ CreateBalancesObject[date, importCSV[formatBalancesFilename@date]]
+ 
+formatBalancesFilename[date_String] := FileNameJoin[{GetBalancesDir[], date <> ".csv"}]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

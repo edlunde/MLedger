@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* ::Subsection:: *)
-(*Balances object*)
+(*Balances objects*)
 
 
 CreateBalancesObject::usage = "CreateBalancesObject[date, accountBalances] creates \
@@ -14,3 +14,17 @@ IsBalances::usage = "IsBalances[obj] returns True if obj is recognized as a bala
 object, false otherwise.";
 IsAccountBalances::usage = "IsAccountBalances[obj] returns True if obj is a list \
 of account balances, false otherwise.";
+
+
+(* ::Subsection:: *)
+(*Balances file handling*)
+
+
+GetBalancesDir::usage = "GetBalancesDir[] returns the directory used for balances.";
+SetBalancesDir::usage = "SetBalancesDir[directory] sets the directory used for balances.";
+
+
+ReadBalances::usage = "ReadBalances[date] reads the balance file for the given date.";
+
+WriteToBalances::usage = "WriteToBalances[balances] writes the given balances object \
+to GetBalancesDir[]/date.csv";
