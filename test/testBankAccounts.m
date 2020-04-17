@@ -213,12 +213,12 @@ AddTest[nordeaTestsInternal, "testImportNordea",
    AssertTrue[IsJournal@imported];
    AssertEquals[17, Length@imported];
    
-   AssertEquals["2003-10-14", imported[[1, "date"]]];
-   AssertEquals["ATM Withdrawal - ITERAC", imported[[3, "description"]]];
-   AssertEquals[-33.55`, imported[[-5, "amount"]]];
-   AssertEquals[-72.47, imported[[-1, "balance"]]];
-   AssertEquals["nordeaTestAcc", imported[[-1, "account"]]];
-   AssertEquals["SEK", imported[[-1, "currency"]]];
+   AssertEquals["2003-11-08", imported[[1, "date"]]];
+   AssertEquals["ATM Withdrawal - ITERAC", imported[[-3, "description"]]];
+   AssertEquals[-33.55`, imported[[5, "amount"]]];
+   AssertEquals[-72.47, imported[[1, "balance"]]];
+   AssertEquals["nordeaTestAcc", imported[[1, "account"]]];
+   AssertEquals["SEK", imported[[1, "currency"]]];
   ];
  ];
 ];

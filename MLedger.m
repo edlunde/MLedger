@@ -360,10 +360,16 @@ handleNordeaLine[account_String] := handleNordeaLine[#, account] &
 handleNordeaLine[
   {"Datum", "Transaktion", "Kategori", "Belopp", "Saldo"}, account_String
   ] := Sequence[]
+handleNordeaLine[{}, __] := Sequence[]
 handleNordeaLine[
-  {dateString_String, description_String, type_String, amount_?NumericQ, 
-   balance_?NumericQ}, account_String
-  ] := CreateJournalEntry[dateString, description, amount, balance, account, "SEK"]
+  {dateString_String, description_String, type_String, amount_String, 
+   balance_String}, account_String
+  ] := CreateJournalEntry[
+   dateString, description, parseSweNumberString@amount, parseSweNumberString@balance, 
+   account, "SEK"]
+   
+parseSweNumberString[amount_String] :=
+ ToExpression@StringReplace[amount, {" kr"->"", "." -> "", " "->"", ","->"."}]
 (* ::Section:: *)
 (*Journals*)
 (* ::Package:: *)
