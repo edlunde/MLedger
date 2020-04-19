@@ -223,6 +223,13 @@ Begin["`Private`"];
 toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
 
 
+sortByDateDescending[list_] /; And @@ (KeyExistsQ[#, "date"] & /@ list):=
+ list[[Ordering[getListOfDates@list, All, OrderedQ[{#2, #1}] &]]]
+ 
+getListOfDates[list_] := 
+ Normal[DateList /@ list[[All, "date"]]]
+
+
 (* ::Subsection::Closed:: *)
 (*Data structure functions*)
 
@@ -323,7 +330,8 @@ BoAFilePattern = "stmt" ~~ ___ ~~ ".txt";
 
 
 importBoA[filename_String, account_String] := 
- CreateJournal[handleBoALine[account] /@ extractTableBoA@Import[filename]]
+ CreateJournal[
+  handleBoALine[account] /@ Reverse@extractTableBoA@Import[filename]]
  
 extractTableBoA[str_String] :=
  StringTrim /@ DeleteCases[StringSplit[#, "  "], ""] & /@ StringSplit[str, "\n"]
@@ -557,8 +565,6 @@ mergeJournals[journals : {__?IsJournal}] :=
  CreateJournal@sortByDateDescending[
   DeleteDuplicatesBy[#["id"]&][Join@@(Normal /@ journals)]
   ]
-sortByDateDescending[list_] :=
- Reverse@SortBy[DateList[#[["date"]]]&]@list
 (* ::Section:: *)
 (*Categorization*)
 (* ::Package:: *)

@@ -7,6 +7,13 @@
 toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
 
 
+sortByDateDescending[list_] /; And @@ (KeyExistsQ[#, "date"] & /@ list):=
+ list[[Ordering[getListOfDates@list, All, OrderedQ[{#2, #1}] &]]]
+ 
+getListOfDates[list_] := 
+ Normal[DateList /@ list[[All, "date"]]]
+
+
 (* ::Subsection:: *)
 (*Data structure functions*)
 

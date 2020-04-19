@@ -75,7 +75,8 @@ BoAFilePattern = "stmt" ~~ ___ ~~ ".txt";
 
 
 importBoA[filename_String, account_String] := 
- CreateJournal[handleBoALine[account] /@ extractTableBoA@Import[filename]]
+ CreateJournal[
+  handleBoALine[account] /@ Reverse@extractTableBoA@Import[filename]]
  
 extractTableBoA[str_String] :=
  StringTrim /@ DeleteCases[StringSplit[#, "  "], ""] & /@ StringSplit[str, "\n"]
@@ -94,7 +95,7 @@ numberStringQ[str_String] := StringMatchQ[str, NumberString]
 numberStringQ[obj___] := False
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Nordea*)
 
 

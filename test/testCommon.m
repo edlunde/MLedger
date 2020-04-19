@@ -10,10 +10,28 @@ AddSuite[MLedgerTests, commonTests];
 AddSuite[commonTests, datesTests];
 
 
+Begin["MLedger`Private`"];
 AddTest[datesTests, "testToDateString",
- AssertEquals["2004-01-01", MLedger`Private`toDateString[{2004, 1, 1, 0, 0, 0}]];
- AssertEquals["2004-01-01", MLedger`Private`toDateString["2004-01-01"]];
+ AssertEquals["2004-01-01", toDateString[{2004, 1, 1, 0, 0, 0}]];
+ AssertEquals["2004-01-01", toDateString["2004-01-01"]];
 ];
+
+AddTest[datesTests, "testSortByDateDescending",
+ AssertEquals[sortByDateDescending, 
+  Head@sortByDateDescending@{<|"date" -> "2004-01-01"|>, <|"notdate" -> "2004-14-99"|>}];
+ With[{list = {
+   <|"date" -> "2004-01-01", "value" -> 1|>, 
+   <|"date" -> "2003-11-01", "value" -> 2|>, 
+   <|"date" -> "2004-01-01", "value" -> 3|>
+   }},
+  (* Check order maintained for entries with identical date *)
+  AssertEquals[{1, 3, 2}, sortByDateDescending[list][[All, "value"]]];
+  AssertEquals[{1, 3, 2}, Normal@sortByDateDescending[Dataset@list][[All, "value"]]];
+  AssertTrue[Dataset, Head@sortByDateDescending[Dataset@list]]
+ ];
+];
+
+End[];(* MLedger`Private` *)
 
 
 (* ::Subsection:: *)

@@ -55,4 +55,5 @@ If[readyToWrite == 1, WriteToJournal@updatedJournal]
 (*Write to ledger*)
 
 
-WriteLedgerFromJournalFiles[2003]
+readyToWrite = 0;
+If[readyToWrite == 1, WriteLedgerFromJournalFiles[2003]]

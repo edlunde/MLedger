@@ -82,7 +82,7 @@ calculateBalances[journal_?IsJournal, incomingBalance_?NumericQ] :=
 (*calculateBalances[journal,0.55]*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Journal file handling*)
 
 
@@ -183,5 +183,3 @@ mergeJournals[journals : {__?IsJournal}] :=
  CreateJournal@sortByDateDescending[
   DeleteDuplicatesBy[#["id"]&][Join@@(Normal /@ journals)]
   ]
-sortByDateDescending[list_] :=
- Reverse@SortBy[DateList[#[["date"]]]&]@list

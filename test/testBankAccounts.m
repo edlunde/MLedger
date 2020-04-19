@@ -132,7 +132,7 @@ End[];
 AddSuite[bankAccountsTests, bankSpecificTests];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Bank of America*)
 
 
@@ -166,12 +166,20 @@ AddTest[BoATestsInternal, "testImportBoA",
    AssertTrue[IsJournal@imported];
    AssertEquals[17, Length@imported];
    
-   AssertEquals["2003-10-14", imported[[1, "date"]]];
-   AssertEquals["ATM Withdrawal - ITERAC", imported[[3, "description"]]];
-   AssertEquals[-33.55`, imported[[-5, "amount"]]];
-   AssertEquals[-72.47, imported[[-1, "balance"]]];
-   AssertEquals["BoATestAcc", imported[[-1, "account"]]];
-   AssertEquals["USD", imported[[-1, "currency"]]];
+   (* Check one of each field *)
+   AssertEquals["2003-10-14", imported[[-1, "date"]]];
+   AssertEquals["ATM Withdrawal - ITERAC", imported[[-3, "description"]]];
+   AssertEquals[-33.55`, imported[[5, "amount"]]];
+   AssertEquals[-72.47, imported[[1, "balance"]]];
+   AssertEquals["BoATestAcc", imported[[1, "account"]]];
+   AssertEquals["USD", imported[[1, "currency"]]];
+   
+   (* Check sorted by date descending and order correct for balances *)
+   AssertEquals[
+    {<|"date" -> "2003-11-06", "amount" -> -710.49, "balance" -> -62.47|>,
+     <|"date" -> "2003-11-03", "amount" -> -100.,   "balance" -> 648.02|>,
+     <|"date" -> "2003-11-03", "amount" -> -33.55,  "balance" -> 748.02 |>},
+    Normal@imported[[3;;5, {"date", "amount", "balance"}]]];
   ];
  ];
 ];
@@ -179,7 +187,7 @@ AddTest[BoATestsInternal, "testImportBoA",
 End[];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Nordea*)
 
 

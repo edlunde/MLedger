@@ -103,7 +103,7 @@ AddTest[journalObjectsTests, "testIsJournalEntry",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*SetCategories*)
 
 
@@ -189,7 +189,7 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test journal file handling*)
 
 
@@ -352,7 +352,7 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
   AssertTrue[IsJournal@journalRead];
   AssertEquals[18, Length@journalRead];
   AssertEquals["BoA Checking", Normal@journalRead[[1, "account"]]];
-  AssertEquals[{-5., 123}, Sort@Normal@journalRead[[;;2, "amount"]]];
+  AssertEquals[{-5., -5., 123}, Sort@Normal@journalRead[[;;3, "amount"]]];
  ];
 ];
 
