@@ -3,7 +3,7 @@
 AddSuite[MLedgerTests, balancesTests];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test balances objects*)
 
 
@@ -47,6 +47,7 @@ AddTest[testBalancesObject, "testCreateBalancesObject",
   CreateBalancesObject["1", {<|"account" -> 1, "balance" -> 1, "currency" -> 1|>}]];
  
  AssertTrue[Not@IsBalances@CreateBalancesObject["1", <|"acc1" -> 1|>]];
+ SetBankAccounts[{}];
  AddBoAAccount@"acc1"; AddNordeaAccount@"acc2"; 
  AssertEquals[{"acc1", "acc2"}, ListBankAccounts[]];
  AssertTrue[Not@IsBalances@CreateBalancesObject["1", <|"acc1" -> 1, "acc3" -> 2|>]];

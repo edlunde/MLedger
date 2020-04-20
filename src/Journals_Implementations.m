@@ -82,7 +82,7 @@ calculateBalances[journal_?IsJournal, incomingBalance_?NumericQ] :=
 (*calculateBalances[journal,0.55]*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Journal file handling*)
 
 
