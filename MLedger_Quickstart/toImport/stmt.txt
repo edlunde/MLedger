@@ -17,7 +17,7 @@ Date           Description                                                      
 10/23/2003     Interac Purchase - SUPERMARKET                                               -29.08        40.54
 10/24/2003     Interac Refund - ELECTRONICS                                                   2.99        43.53
 10/27/2003     Telephone Bill Payment - VISA                                                 -6.77        36.76
-10/28/2003     Payroll Deposit - HOTEL                                                      731.57       731.57
+10/28/2003     Payroll Deposit - HOTEL                                                      694.81       731.57
 10/30/2003     Web Funds Transfer - From SAVINGS                                             50.00       781.57
 11/03/2003     Pre-Auth. Payment - INSURANCE                                                -33.55       748.02
 11/03/2003     Cheque No. - 409                                                            -100.00       648.02

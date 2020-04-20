@@ -130,7 +130,7 @@ AddTest[journalObjectsTests, "testSetCategories",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*AddCalculatedBalances*)
 
 
@@ -147,12 +147,22 @@ AddTest[journalObjectsTests, "testAddCalculatedBalances",
       withBalances)
    ];
    
-(*   AssertEquals[
+   (* Check calculation *)
+   AssertEqualsN[
     Normal@withBalances[All, "balance"], 
     Normal@withBalances[All, "calcBalance"]
-   ];*)
-  ]
- ]
+   ];
+   
+   (* Check calcBalance recalculated *)
+   With[{withBalances2 = AddCalculatedBalances[withBalances, 1 + 0.55]},
+    AssertTrue[IsJournal@withBalances2];
+    AssertEqualsN[
+     1 + Normal@withBalances2[All, "balance"], 
+     Normal@withBalances2[All, "calcBalance"]
+    ];
+   ];
+  ];
+ ];
 ];
 
 
@@ -187,7 +197,7 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test journal file handling*)
 
 

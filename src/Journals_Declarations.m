@@ -22,7 +22,9 @@ of categories with equal length and sets the \"category\"-field of the journal's
 entries to the given categories.";
 
 
-AddCalculatedBalances::usage = "";
+AddCalculatedBalances::usage = "AddCalculatedBalances[journal, incomingBalance] \
+calculates and adds a field calcBalance to the given journal assuming the balance \
+before first entry was incomingBalance.git";
 
 
 (* ::Subsection:: *)

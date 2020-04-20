@@ -4,7 +4,7 @@
 (*Journal objects*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Journal*)
 
 
@@ -68,18 +68,27 @@ SetCategories[journalIn_?IsJournal, categories_List] /; If[
   Dataset@journal]
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*AddCalculatedBalances*)
 
 
 AddCalculatedBalances[journal_?IsJournal, incomingBalance_?NumericQ] :=
- Insert[#, "calcBalance" -> 0., Position[Keys@#, "balance"] + 1] & /@ journal
+ With[{balances = calculateBalances[journal, incomingBalance]},
+  CreateJournal@MapThread[
+   Insert[#1, "calcBalance" -> #2, calcBalancePosition[#1]] &,
+   {Normal@journal, balances},
+   1
+  ]
+ ]
+
+calcBalancePosition[entry_?IsJournalEntry] := 
+ If[KeyExistsQ[entry, "calcBalance"],
+  Position[Keys@entry, "calcBalance"] + 1,
+  Position[Keys@entry, "balance"] + 1
+ ]
  
 calculateBalances[journal_?IsJournal, incomingBalance_?NumericQ] := 
- journal
-
-
-(*calculateBalances[journal,0.55]*)
+  (journal[Reverse, "amount"] // Normal // Accumulate // Reverse) + incomingBalance
 
 
 (* ::Subsection::Closed:: *)
