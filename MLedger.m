@@ -222,6 +222,18 @@ ReadBalances::usage = "ReadBalances[date] reads the balance file for the given d
 
 WriteToBalances::usage = "WriteToBalances[balances] writes the given balances object \
 to GetBalancesDir[]/date.csv";
+(* ::Section:: *)
+(*Presentation*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Presentation common*)
+
+
+FormattedGrid::usage = "Formats a two dimensional table of numbers into a Grid. \
+Numbers are rounded to nearest integer. Handles list of lists, association of list \
+(keys added as row names, list of associations (keys added as column names), \
+and association of associations (interpreted as having both row and column names).";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -893,6 +905,34 @@ extractDate[balancesFilename_String] :=
  StringCases[FileNameTake[balancesFilename], 
   year : NumberString ~~ "-" ~~ month : NumberString ~~ "-" ~~ 
   day : NumberString ~~ ".csv" :> year <> "-" <> month <> "-" <> day]
+(* ::Section:: *)
+(*Presentation*)
+(* ::Package:: *)
+
+(* ::Subsection::Closed:: *)
+(*Presentation common*)
+
+
+FormattedGrid[table_] /; Length@table > 0 && And@@(Length@# > 0 & /@ table) :=
+ Grid[round@moveRowAndColumnNamesIntoTable@table,
+  Dividers -> {False, {-2 -> True}},
+  Alignment -> {{Right, 1 -> Left}}
+ ]
+moveRowAndColumnNamesIntoTable[tableIn_] :=
+ Module[{table = tableIn},
+  (* Remove column keys*)
+  table = If[AssociationQ@#, Values@#, Flatten@{#}] & /@ table;
+  (* Move row keys into rows *)
+  If[AssociationQ@table, table = KeyValueMap[Prepend[#2, #1] &, table]];
+  (* Add column keys as header list *)
+  If[AssociationQ@tableIn[[1]], PrependTo[table, Keys@tableIn[[1]]]];
+  (* If there where row and column keys, header is one item short, add empty string *)
+  If[Length@table[[1]] < Length@table[[2]], table[[1]] = Prepend[table[[1]], ""]];
+  
+  table
+ ]
+
+SetAttributes[round, Listable]; round[s_String] := s; round[x_] := Round[x, 1];
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];
