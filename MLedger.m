@@ -222,6 +222,7 @@ Begin["`Private`"];
 (*Misc.*)
 
 
+(* Only tested implicitly *)
 SetAttributes[messageIfNot, HoldAll]
 messageIfNot[condition_, message_, messageArgs___] :=
  If[condition, True, Message[message, messageArgs]; False]
@@ -814,7 +815,22 @@ ReadBalances[date_String] /;
 formatBalancesFilename[date_String] := FileNameJoin[{GetBalancesDir[], date <> ".csv"}]
 
 
-
+getPrecedingBalances[date_String] := 
+ With[{precedingDate = getPrecedingBalancesDate@date},
+  If[StringQ@precedingDate && FileExistsQ@formatBalancesFilename@precedingDate,
+   ReadBalances@precedingDate,
+   {}]
+  ]
+  
+getPrecedingBalancesDate[date_String] := 
+ {QuantityMagnitude@DateDifference[#, date], #} & /@ listBalancesDates[] //
+   Select[#, #[[1]] >= 0 &] & // SortBy[#, #[[1]] &] & // If[#=={}, {}, #[[1, 2]]] &
+listBalancesDates[] := 
+ Flatten[extractDate /@ FileNames[__ ~~ ".csv", GetBalancesDir[]]]
+extractDate[balancesFilename_String] := 
+ StringCases[FileNameTake[balancesFilename], 
+  year : NumberString ~~ "-" ~~ month : NumberString ~~ "-" ~~ 
+  day : NumberString ~~ ".csv" :> year <> "-" <> month <> "-" <> day]
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

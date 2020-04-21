@@ -4,6 +4,7 @@
 (*Misc.*)
 
 
+(* Only tested implicitly *)
 SetAttributes[messageIfNot, HoldAll]
 messageIfNot[condition_, message_, messageArgs___] :=
  If[condition, True, Message[message, messageArgs]; False]
