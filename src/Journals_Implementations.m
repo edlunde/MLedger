@@ -4,7 +4,7 @@
 (*Journal objects*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Journal*)
 
 
@@ -17,8 +17,9 @@ CreateJournal[] := CreateJournal[{}]
 
 addIDs::duplicate = "Warning! Duplicate entries in { \n`1` \n... }";
 addIDs[journal_?IsJournal] := (
- If[Not@DuplicateFreeQ[Normal@journal], 
-  Message[addIDs::duplicate, ToString[Normal@journal[[ ;; 2]]]]];
+ messageIfNot[DuplicateFreeQ[Normal@journal], 
+  addIDs::duplicate, ToString[Normal@journal[[ ;; 2]]]
+  ];
   addID /@ journal)
  
 addID[entry_?IsJournalEntry] := 
@@ -54,14 +55,14 @@ With[{journalKeys = Sort@Keys@CreateJournalEntry[]},
 ]
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*SetCategories*)
 
 
 SetCategories::length = "Journal `1` and categories `2` not of equal length.";
-SetCategories[journalIn_?IsJournal, categories_List] /; If[
-  Length@journalIn === Length@categories, True,
-  Message[SetCategories::length, Short@journalIn, Short@categories]; False
+SetCategories[journalIn_?IsJournal, categories_List] /; messageIfNot[
+  Length@journalIn === Length@categories,
+  SetCategories::length, Short@journalIn, Short@categories
  ] :=
  Module[{journal = Normal@journalIn}, 
   journal[[All, "category"]] = categories;
@@ -91,7 +92,13 @@ calculateBalances[journal_?IsJournal, incomingBalance_?NumericQ] :=
   (journal[Reverse, "amount"] // Normal // Accumulate // Reverse) + incomingBalance
 
 
-(* ::Subsection::Closed:: *)
+withBalances = AddCalculatedBalances[journal, 0.55]
+
+
+withBalances2 = AddCalculatedBalances[withBalances, 1 + 0.55]
+
+
+(* ::Subsection:: *)
 (*Journal file handling*)
 
 
@@ -105,9 +112,9 @@ ListAccountsWithJournals::extraFiles = "Warning: found files not recognized as b
 to journals - `1`";
 ListAccountsWithJournals[] :=
  With[{journalFolders = FileNameTake /@ FileNames[All, GetJournalDir[]]},
-  If[MemberQ[journalFolders, x_ /; Not@BankAccountNameQ@x],
-   Message[ListAccountsWithJournals::extraFiles, 
-    Select[journalFolders, Not@BankAccountNameQ@# &]]
+  messageIfNot[Not@MemberQ[journalFolders, x_ /; Not@BankAccountNameQ@x],
+   ListAccountsWithJournals::extraFiles, 
+   Select[journalFolders, Not@BankAccountNameQ@# &]
   ];
   Select[journalFolders, BankAccountNameQ]
  ]

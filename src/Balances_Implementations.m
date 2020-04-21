@@ -42,9 +42,12 @@ WriteToBalances[balances_?IsBalances] :=
  Export[formatBalancesFilename@balances["date"], Dataset@balances["accountBalances"]]
  
 ReadBalances[date_String] /; 
- If[FileExistsQ@formatBalancesFilename@date,
-  True,
-  Message[Import::nffil, formatBalancesFilename@date]; False] :=
- CreateBalancesObject[date, importCSV[formatBalancesFilename@date]]
+ With[{filename = formatBalancesFilename@date},
+  messageIfNot[FileExistsQ@filename, Import::nffil, filename]
+ ] :=
+  CreateBalancesObject[date, importCSV[formatBalancesFilename@date]]
  
 formatBalancesFilename[date_String] := FileNameJoin[{GetBalancesDir[], date <> ".csv"}]
+
+
+
