@@ -17,6 +17,17 @@ of account balances, false otherwise.";
 
 
 (* ::Subsection:: *)
+(*Balances input form*)
+
+
+BalancesInputForm::usage = "form = BalancesInputForm[date] gives an input form \
+for recording balances for a given date, prefilled with balances calculated from \
+existing data. Use ExtractBalances[form] to get result when done filling out.";
+ExtractBalances::usage = "ExtractBalances[form] returns a Balances object created \
+from the given form. Expects a form from BalancesInputForm.";
+
+
+(* ::Subsection:: *)
 (*Balances file handling*)
 
 

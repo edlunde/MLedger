@@ -10,15 +10,16 @@
 
 
 Needs["MLedger`", ParentDirectory[NotebookDirectory[]] <> "/MLedger.m"];
-Get[NotebookDirectory[]<>"setupAccounts.m"]
+Get[NotebookDirectory[] <> "setupAccounts.m"]
 
 
 setupBankAccounts[]
 SetJournalDir[NotebookDirectory[] <> "Journals/"]
 SetLedgerDir[NotebookDirectory[] <> "Ledger/"]
+SetBalancesDir[NotebookDirectory[] <> "Balances/"]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Importing from accounts*)
 
 
@@ -33,7 +34,7 @@ readyToWrite = 0;
 If[readyToWrite == 1, WriteToJournal /@ imported]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Categorization*)
 
 
@@ -51,9 +52,32 @@ readyToWrite = 0;
 If[readyToWrite == 1, WriteToJournal@updatedJournal]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Write to ledger*)
 
 
 readyToWrite = 0;
 If[readyToWrite == 1, WriteLedgerFromJournalFiles[2003]]
+
+
+(* ::Subsection:: *)
+(*Input balances*)
+
+
+(* ::Text:: *)
+(*Create example balances*)
+
+
+EnsureDirectoryExists[GetBalancesDir[]]
+WriteToBalances@CreateBalancesObject[
+ "2003-10-09", <|"Example BoA account" -> 0.55, "Example Nordea account" -> 0.55|>]
+
+
+form = BalancesInputForm["2004-01-01"]
+
+
+balances = ExtractBalances@form
+
+
+readyToWrite = 0;
+If[readyToWrite == 1, WriteToBalances@balances]

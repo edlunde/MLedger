@@ -35,3 +35,13 @@ exampleJournalData2[[;; ;; 3, 5]] = "BoA Savings";
 exampleJournalData2[[;; 5, 3]] = 123;
  
 (* CreateJournal[CreateJournalEntry@@@exampleJournalData2] *)
+
+
+(* ::Subsection:: *)
+(*Balances*)
+
+
+exampleBalanceData = {"2003-10-09", 
+ {<|"account"->"Example BoA account" ,"balance"->0.55,"currency"->"USD"|>,
+  <|"account"->"Example Nordea account" ,"balance"->0.55,"currency"->"SEK" |>}
+  };

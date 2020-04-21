@@ -61,7 +61,51 @@ AddTest[testBalancesObject, "testCreateBalancesObject",
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
+(*Test balances input form*)
+
+
+AddSuite[balancesTests, balancesInputFormTests];
+
+
+AddTest[balancesInputFormTests, "Set Up", 
+ testDirTemp = currentDir (* created in testScript.sh *) <> "testDirTemp642/";
+ SetBalancesDir[testDirTemp];
+ EnsureDirectoryExists[GetBalancesDir[]];
+ SetBankAccounts[{}];
+ AddBoAAccount@"acc1"; AddNordeaAccount@"acc2"; 
+ WriteToBalances[CreateBalancesObject["2003-10-19", <|"acc1" -> 2, "acc2" -> -4|>]];
+];
+
+AddTest[balancesFileHandlingTests, "Tear Down", 
+ ClearAll[testDirTemp, exampleBalances];
+ SetBalancesDir[""];
+ SetBankAccounts[{}];
+];
+
+
+AddTest[balancesInputFormTests, "testBalancesInputForm",
+ AssertMessage[BalancesInputForm::noAccounts, BalancesInputForm@"2001-01-01"];
+ AssertNoMessage[BalancesInputForm@"2004-01-01"];
+ AssertEquals[Labeled, Head@BalancesInputForm@"2004-01-01"];
+ (* Check title is correct date *)
+ AssertMatch[Labeled[___, Style["2004-01-01", ___], ___], BalancesInputForm@"2004-01-01"];
+ (* Check form *)
+ AssertMatch[Labeled[Grid[{
+  {"Account", "Currency", "Balance"}, (* Header *)
+  {"acc1", "USD", InputField[__]},
+  {"acc2", "SEK", InputField[__]}
+  }], ___], BalancesInputForm@"2004-01-01"];
+  
+ With[{balances = ExtractBalances@BalancesInputForm@"2004-01-01"},
+  AssertTrue[IsBalances@balances];
+  AssertEquals["2004-01-01", balances[["date"]]];
+  AssertEquals[{2, -4}, balances[["accountBalances", All, "balance"]]];
+ ];
+];
+
+
+(* ::Subsection::Closed:: *)
 (*Test balances file handling*)
 
 
@@ -72,7 +116,7 @@ AddTest[balancesFileHandlingTests, "Set Up",
  testDirTemp = currentDir (* created in testScript.sh *) <> "testDirTemp642/";
  SetBalancesDir[testDirTemp];
  
- exampleBalances = CreateBalancesObject["2003-10-09", {<|"account"->"Example BoA account" ,"balance"->0.55,"currency"->"USD"|>,<|"account"->"Example Nordea account" ,"balance"->0.55,"currency"->"SEK" |>}];
+ exampleBalances = CreateBalancesObject@@exampleBalanceData;
 ];
 
 AddTest[balancesFileHandlingTests, "Tear Down", 
@@ -124,7 +168,7 @@ AddTest[readWriteBalancesTests, "testReadWriteBalances",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 

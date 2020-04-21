@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Balances objects*)
 
 
@@ -28,7 +28,58 @@ With[{keys = {"account", "balance", "currency"}},
 IsAccountBalances[___] := False
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
+(*Balances input form*)
+
+
+BalancesInputForm[date_String] /; checkDateHasBalances[date] := 
+ labelBalancesInputForm[date, balancesForm[getPrecedingBalances@date]]
+
+BalancesInputForm::noAccounts = "Error! No balances for `1` or earlier found.";
+checkDateHasBalances[date_String] := 
+ If[getPrecedingBalancesDate[date] === {}, 
+  Message[BalancesInputForm::noAccounts, date]; False, 
+  True]
+  
+labelBalancesInputForm[date_, form_] :=
+ Labeled[form, Style[date, "Subsubsection"], {Top}, Spacings -> {0, 1.2}]
+ 
+With[{header = {"Account", "Currency", "Balance"}},
+ balancesForm[balances_?IsBalances] := 
+  Grid[Prepend[#, header] & @
+   (balanceFormRow /@ balances["accountBalances"])
+  ]
+]
+(* Only partially tested as usual with Dynamic *)
+balanceFormRow[entry_] :=
+ With[{balance = Unique@"balance", fieldSize = 7},
+  balance = entry["balance"];
+  Append[Values[entry[[{"account", "currency"}]]],
+   InputField[
+    Dynamic[
+     If[balance == Round@balance, balance, SetAccuracy[balance, 3]], 
+      (balance = Round[#, 0.01])&], 
+    Number, FieldSize -> fieldSize]
+  ]
+ ]
+
+
+ExtractBalances[form_] :=
+ CreateBalancesObject[
+  extractDateFromBalancesForm@form,
+  extractAccountBalancesFromBalancesForm@form
+ ]
+ 
+extractDateFromBalancesForm[balanceForm_] := 
+ Cases[balanceForm, Labeled[___, Style[date_, __], ___] :> date, All][[1]]
+extractAccountBalancesFromBalancesForm[balanceForm_] := 
+ Cases[balanceForm, 
+   {account_, currency_, InputField[_[_[_, balance_?NumericQ, ___], ___], __]} :> 
+    <|"account" -> account, "balance" -> balance, "currency" -> currency|>, 
+   All]
+
+
+(* ::Subsection::Closed:: *)
 (*Balances file handling*)
 
 
