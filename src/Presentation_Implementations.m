@@ -24,3 +24,17 @@ moveRowAndColumnNamesIntoTable[tableIn_] :=
  ]
 
 SetAttributes[round, Listable]; round[s_String] := s; round[x_] := Round[x, 1];
+
+
+addTotalFooter::usage = "addTotalFooter[table, label : Total] takes a table and \
+appends a footer row giving the totals of each column. If the table is an association \
+(has row labels), the given label is used for the footer. Non-numeric entries are \
+treated as being zero."
+addTotalFooter[table_, label_ : "Total"]  /; 
+  Length@table > 0 && And@@(Length@# > 0 & /@ table) := 
+ Append[table, 
+  If[AssociationQ@table, label -> #, #]&@Query[nonNumericToZero /* Total]@table]
+  
+nonNumericToZero[x_?NumericQ] := x
+nonNumericToZero[x_ /; Length@x == 0] := 0
+nonNumericToZero[lst_] := nonNumericToZero /@ lst
