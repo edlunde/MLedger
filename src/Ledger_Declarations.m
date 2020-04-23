@@ -9,6 +9,10 @@ as a Ledger, False otherwise."
 CreateLedger::usage = "CreateLedger[journal] creates a ledger from a journal.";
 
 
+GetBalancesFromLedger::usage = "GetBalancesFromLedger[ledger] gives debit - credit \
+for each account and category of expense in ledger.";
+
+
 (* ::Subsection:: *)
 (*Ledger file handling*)
 

@@ -162,6 +162,10 @@ as a Ledger, False otherwise."
 CreateLedger::usage = "CreateLedger[journal] creates a ledger from a journal.";
 
 
+GetBalancesFromLedger::usage = "GetBalancesFromLedger[ledger] gives debit - credit \
+for each account and category of expense in ledger.";
+
+
 (* ::Subsection::Closed:: *)
 (*Ledger file handling*)
 
@@ -721,6 +725,18 @@ journalEntryToLedgerLines[entry_?IsJournalEntry] :=
   
   ledgerLines
 ]
+
+
+(* ::Subsubsection::Closed:: *)
+(*GetBalancesFromLedger*)
+
+
+GetBalancesFromLedger[ledger_?IsLedger] :=
+ Query[GroupBy[#account&], <|"balance" -> Total /* (Subtract@@# &)|>,
+  {"debit", "credit"}]@setMissingDebitCreditToZero@ledger // Normal
+  
+setMissingDebitCreditToZero[ledger_?IsLedger] :=
+ MapAt[If[# == "", 0, #] &, ledger, {{All, "debit"}, {All, "credit"}}]
 
 
 (* ::Subsection::Closed:: *)

@@ -4,7 +4,7 @@
 (*Ledger object*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Ledger*)
 
 
@@ -18,7 +18,7 @@ IsLedger[dataset_Dataset] := And @@ (isLedgerLine /@ dataset)
 IsLedger[___] := False
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*LedgerLine*)
 
 
@@ -65,6 +65,18 @@ journalEntryToLedgerLines[entry_?IsJournalEntry] :=
   
   ledgerLines
 ]
+
+
+(* ::Subsubsection:: *)
+(*GetBalancesFromLedger*)
+
+
+GetBalancesFromLedger[ledger_?IsLedger] :=
+ Query[GroupBy[#account&], <|"balance" -> Total /* (Subtract@@# &)|>,
+  {"debit", "credit"}]@setMissingDebitCreditToZero@ledger // Normal
+  
+setMissingDebitCreditToZero[ledger_?IsLedger] :=
+ MapAt[If[# == "", 0, #] &, ledger, {{All, "debit"}, {All, "credit"}}]
 
 
 (* ::Subsection::Closed:: *)

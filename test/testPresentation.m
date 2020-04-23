@@ -48,7 +48,7 @@ AddTest[presentationCommonTests, "testFormattedGrid",
 
 Begin["MLedger`Private`"];
 AddSuite[presentationCommonTests, presentationCommonTestsInternal]
-AddTest[presentationCommonTests, "testAddTotalFooter",
+AddTest[presentationCommonTestsInternal, "testAddTotalFooter",
  Module[{justTable, rowNames, colNames, wRowNames, wColumnNames, wBoth, tableList},
   justTable = {{1, -5, 7}, {-5, "a", -1}, {"3", -8, 6}, {-6, 0, 1}, {5, 6, 6}};
   rowNames = "row" <> ToString@# &/@ Range@Length@justTable;

@@ -132,7 +132,37 @@ AddTest[ledgerObjectTests, "testCreateLedgerFromLedgerLines",
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsubsection:: *)
+(*GetBalancesFromLedger tests*)
+
+
+AddTest[ledgerObjectTests, "testGetBalancesFromLedger",
+ With[{ledger = CreateLedger@exampleJournal},
+  AssertTrue[IsLedger@ledger];
+  With[{balances = GetBalancesFromLedger@ledger},
+   AssertEquals[Association, Head@balances];
+   AssertEquals[{"BoA Checking", ""}, Keys@balances];
+   AssertEquals[-73.02, balances["BoA Checking", "balance"]];
+   AssertEquals[73.02, balances["", "balance"]];
+  ];
+ ];
+ 
+ (* Category "Internal" is handled differently, check only gives entry for
+    actual bank account and not for category account. *)
+ With[{ledger = CreateLedger@MapAt["Internal" &, exampleJournal, {3, "category"}]},
+  AssertTrue[IsLedger@ledger];
+  With[{balances = GetBalancesFromLedger@ledger},
+   AssertEquals[Association, Head@balances];
+   AssertEquals[{"BoA Checking", ""}, Keys@balances]; (* Note no "Internal" *)
+   AssertEquals[-73.02, balances["BoA Checking", "balance"]];
+   (* Removed an entry from "", different balance *)
+   AssertEquals[-637.47, balances["", "balance"]]; 
+  ];
+ ];
+];
+
+
+(* ::Subsection::Closed:: *)
 (*Test ledger file handling*)
 
 
