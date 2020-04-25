@@ -3,7 +3,7 @@
 AddSuite[MLedgerTests, presentationTests];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test presentation common*)
 
 
@@ -38,6 +38,9 @@ AddTest[presentationCommonTests, "testFormattedGrid",
    FormattedGrid[justTable]];
   AssertMatch[Grid[List[List__], ___, Alignment -> {{Right, 1 -> Left}}, ___], 
    FormattedGrid[justTable]];
+   
+  (* Test works for 1d associations as well *)
+  AssertMatch[Grid[{#, __} & /@ colNames, ___], FormattedGrid@First@wBoth]
  ];
 ];
 
@@ -66,6 +69,39 @@ AddTest[presentationCommonTestsInternal, "testAddTotalFooter",
    
   AssertEquals["Total", Last@Keys@addTotalFooter@wRowNames];
   AssertEquals["Sum", Last@Keys@addTotalFooter[wRowNames, "Sum"]];
+  
+  (* Test works for 1d associations as well *)
+  AssertEquals[6, Last@Values@addTotalFooter@<|"a" -> 1, "b" -> 2, "c" -> 3|>]
  ];
 ];
 End[]; (* End "MLedger`Private`" *)
+
+
+(* ::Subsection:: *)
+(*Test budget sheet*)
+
+
+AddSuite[presentationTests, budgetSheetTests];
+
+
+AddTest[budgetSheetTests, "testCreateBudgetSheet",
+ With[{ledgerWCategories = 
+   CreateLedger@SetCategories[
+    CreateJournal[CreateJournalEntry@@@exampleJournalData],
+    categoriesForExampleJournal]},
+  AssertTrue@IsLedger@ledgerWCategories;
+  
+  With[{budgetSheet = 
+    CreateBudgetSheet[ledgerWCategories, exampleBudget, exampleCategoryGroups]},
+   AssertMatch[Grid[List[__], __], budgetSheet];
+   (* Check title *)
+   AssertMatch[Grid[List[List[Style["November 2003", __], __], __], __], 
+    budgetSheet];
+   (* Check some values *)
+   AssertEquals[{-783}, 
+    Cases[budgetSheet, {___, "Expenses", x_?NumericQ, ___} :> x, All]];
+   AssertEquals[{10}, 
+    Cases[budgetSheet, {___, "Misc.", _, x_?NumericQ, ___} :> x, All]];
+  ];
+ ];
+];

@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Journal*)
 
 
@@ -37,7 +37,13 @@ exampleJournalData2[[;; 5, 3]] = 123;
 (* CreateJournal[CreateJournalEntry@@@exampleJournalData2] *)
 
 
-(* ::Subsection:: *)
+(* Some categories for the exampleJournal *)
+categoriesForExampleJournal =
+ {"Banking fees","Banking fees","Mortgage","","Insurance","Internal","Salary",
+  "","Electronics","Groceries","","","","","","",""};
+
+
+(* ::Subsection::Closed:: *)
 (*Balances*)
 
 
@@ -45,3 +51,21 @@ exampleBalanceData = {"2003-10-09",
  {<|"account"->"Example BoA account" ,"balance"->0.55,"currency"->"USD"|>,
   <|"account"->"Example Nordea account" ,"balance"->0.55,"currency"->"SEK" |>}
   };
+
+
+(* ::Subsection:: *)
+(*Budget*)
+
+
+exampleCategoryGroups = <|
+ "Expenses" -> <|
+  "Mortgage" -> {}, "Groceries" -> {}, (* Leaving Electronics uncategorized*)
+  "Insurance" -> {}, "Misc." -> {"Banking fees"}|>,
+ "Income" -> <|"Salary" -> {}|>,
+ "Savings" -> <|"Investments" -> {}, "Rainy day fund" -> {}|>
+ |>;
+ 
+exampleBudget = <|
+ "Mortgage" -> 711, "Groceries" -> 30,
+ "Insurance" -> 34, "Misc." -> 10
+ |>;
