@@ -996,7 +996,8 @@ createBudgetData[ledger_?IsLedger, budget_, categoryGroups_?isCategoryGroups] :=
   addNonListedCategories[addCategoryNamesToCategories@categoryGroups, ledger]
   ] // addBudgetAndDifferencesEntries[#, budget] & //
    changeSignOnIncome // addTotalFooter /@ # & //
-    addBudgetSummaryTable
+    DeleteCases[#, addTotalFooter[__]] & // (* Remove missing tables *)
+     addBudgetSummaryTable 
     
 formatBudgetSheetTitle[ledger_?IsLedger] :=
  DateString[ledger[1, "date"], {"MonthName", " ", "Year"}]
@@ -1005,18 +1006,27 @@ formatBudgetSheetTitle[ledger_?IsLedger] :=
 
 formatBudgetSheet[categoriesWithBalances_, title_String] :=
  layoutBudgetSheet[
-  FormattedGrid /@ categoriesWithBalances,
+  FormattedGrid /@ categoriesWithBalances // addTableHeadings,
   title]
   
 layoutBudgetSheet[formattedGrids_Association, title_String] :=
  Grid[{
    {Style[title, "Subsection"], SpanFromLeft, SpanFromLeft},
-   Item[#, Alignment -> Bottom]& /@ 
-    Values@formattedGrids[[{"Income", "Savings", "Summary"}]],
+   ifKeyExistsElseSpanLeft[formattedGrids, #] & /@ {"Income", "Savings", "Summary"},
    {Item[formattedGrids["Expenses"], Alignment -> Left], 
     SpanFromLeft, 
-    Item[formattedGrids["Non-recurring costs"], Alignment -> Left]}
+    ifKeyExistsElseSpanLeft[formattedGrids, "Non-recurring costs", Left]}
    }, Spacings->{5, 3}]
+   
+ifKeyExistsElseSpanLeft[assoc_, key_, alignment_ : Bottom] :=
+ If[KeyExistsQ[assoc, key], 
+  Item[assoc[key], Alignment -> alignment],
+  SpanFromLeft]
+  
+addTableHeadings[tables_Association] :=
+ Association@KeyValueMap[
+  #1 -> Insert[#2, Flatten[{#1, Array[""&, Length[#2[[1]]] - 1]}], {1, 1}] &,
+  tables]
 
 
 addBalancesToCategoryGroups[ledger_?IsLedger, categoryGroups_?isCategoryGroups] :=
@@ -1062,7 +1072,10 @@ addBudgetSummaryTable[categoriesWithBalances_] :=
   "Summary" -> addTotalFooter@
     <|"Income" -> categoriesWithBalances["Income", "Total"], 
       "Expenses" -> -categoriesWithBalances["Expenses", "Total", "Result"],
-      "Savings" -> -categoriesWithBalances["Savings", "Total"]|>]
+      If[KeyExistsQ[categoriesWithBalances, "Savings"],
+       "Savings" -> -categoriesWithBalances["Savings", "Total"],
+       <||>]
+      |>]
 (* Generalize to work with any number of category groups with whatever names *)
 (* ::Section::Closed:: *)
 (*Tail*)

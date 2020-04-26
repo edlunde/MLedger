@@ -97,6 +97,46 @@ AddTest[budgetSheetTests, "testCreateBudgetSheet",
    (* Check title *)
    AssertMatch[Grid[List[List[Style["November 2003", __], __], __], __], 
     budgetSheet];
+   (* Check tables have headings *)
+   AssertEquals[{#}, Cases[budgetSheet, 
+    Grid[{{heading: #, "", ___}, ___}, ___] :> heading, 
+    All]] & /@ 
+     {"Income", "Expenses", "Savings", "Summary", "Non-recurring costs"};
+   (* Check some values *)
+   AssertEquals[{-783}, 
+    Cases[budgetSheet, {___, "Expenses", x_?NumericQ, ___} :> x, All]];
+   AssertEquals[{10}, 
+    Cases[budgetSheet, {___, "Misc.", _, x_?NumericQ, ___} :> x, All]];
+  ];
+  
+  (* Check handling Savings category not present *)
+  With[{budgetSheet = 
+    CreateBudgetSheet[ledgerWCategories, exampleBudget, 
+     KeyDrop[exampleCategoryGroups, "Savings"]]},
+   AssertMatch[Grid[List[__], __], budgetSheet];
+   (* Check no missing keys *)
+   AssertEquals[{}, Cases[budgetSheet, Missing["KeyAbsent", __], All]];
+   (* Check no mentions of Savings *)
+   AssertEquals[{}, Cases[budgetSheet, "Savings", All]];
+   (* Check some values *)
+   AssertEquals[{-783}, 
+    Cases[budgetSheet, {___, "Expenses", x_?NumericQ, ___} :> x, All]];
+   AssertEquals[{10}, 
+    Cases[budgetSheet, {___, "Misc.", _, x_?NumericQ, ___} :> x, All]];
+  ];
+  (* Check handling no uncategorized entries present *)
+  With[{budgetSheet = 
+    CreateBudgetSheet[
+     ledgerWCategories[Select[MemberQ[ (* Select entries present in category groups *)
+     KeyValueMap[List,#] & /@ Values@exampleCategoryGroups//Flatten, 
+      #account]&]], 
+     exampleBudget, exampleCategoryGroups]},
+   AssertMatch[Grid[List[__], __], budgetSheet];
+   (* If CreateBudgetSheet tries to create "Non-recurring costs"-table without 
+      such being present, among other things there will be this present*)
+   AssertEquals[{}, Cases[budgetSheet, MLedger`Private`addTotalFooter[{},{}], All]];
+   (* Check no mentions of Non-recurring costs *)
+   (*AssertEquals[{}, Cases[budgetSheet, "Non-recurring costs", All]];*)
    (* Check some values *)
    AssertEquals[{-783}, 
     Cases[budgetSheet, {___, "Expenses", x_?NumericQ, ___} :> x, All]];
