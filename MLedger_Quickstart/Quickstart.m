@@ -5,7 +5,7 @@
 (*To add your own accounts, edit setupBankAccounts[] in ./setupAccounts.m*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Setup*)
 
 
@@ -30,8 +30,7 @@ importForm = SelectAccountsForm[
 imported = ImportAccountFiles[files, ExtractSelectedAccounts[importForm]]
 
 
-readyToWrite = 0;
-If[readyToWrite == 1, WriteToJournal /@ imported]
+WriteToJournal /@ imported
 
 
 (* ::Subsection::Closed:: *)
@@ -39,25 +38,31 @@ If[readyToWrite == 1, WriteToJournal /@ imported]
 
 
 journal = ReadJournal[GetBankAccounts[][[1, "name"]]];
-form = CategorizationForm@journal
+
+
+categoriesForExampleJournal =
+ {"Banking fees","Banking fees","Mortgage","","Insurance","Internal","Salary",
+  "","Electronics","Groceries","","","","","","",""};
+journalWithCategories = SetCategories[journal, categoriesForExampleJournal];
+
+
+form = CategorizationForm@journalWithCategories
 
 
 categories = ExtractSelectedCategories[form]
 
 
-updatedJournal = SetCategories[journal, categories]
+updatedJournal = SetCategories[journalWithCategories, categories]
 
 
-readyToWrite = 0;
-If[readyToWrite == 1, WriteToJournal@updatedJournal]
+WriteToJournal@updatedJournal
 
 
 (* ::Subsection::Closed:: *)
 (*Write to ledger*)
 
 
-readyToWrite = 0;
-If[readyToWrite == 1, WriteLedgerFromJournalFiles[2003]]
+WriteLedgerFromJournalFiles[2003]
 
 
 (* ::Subsection:: *)
@@ -81,3 +86,28 @@ balances = ExtractBalances@form
 
 readyToWrite = 0;
 If[readyToWrite == 1, WriteToBalances@balances]
+
+
+(* ::Subsection::Closed:: *)
+(*Presentation*)
+
+
+(* ::Subsubsection:: *)
+(*Budget*)
+
+
+exampleCategoryGroups = <|
+ "Expenses" -> <|
+  "Mortgage" -> {}, "Groceries" -> {}, (* Leaving Electronics uncategorized*)
+  "Insurance" -> {}, "Misc." -> {"Banking fees"}|>,
+ "Income" -> <|"Salary" -> {}|>,
+ "Savings" -> <|"Investments" -> {}, "Rainy day fund" -> {}|>
+ |>;
+ 
+exampleBudget = <|
+ "Mortgage" -> 711, "Groceries" -> 30,
+ "Insurance" -> 34, "Misc." -> 10
+ |>;
+
+
+CreateBudgetSheet[ReadLedger[2003, 11], exampleBudget, exampleCategoryGroups]
