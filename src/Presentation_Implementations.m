@@ -39,7 +39,7 @@ nonNumericToZero[x_ /; Length@x == 0] := 0
 nonNumericToZero[lst_] := nonNumericToZero /@ lst
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Budget sheet*)
 
 
@@ -143,3 +143,33 @@ addBudgetSummaryTable[categoriesWithBalances_] :=
        <||>]
       |>]
 (* Generalize to work with any number of category groups with whatever names *)
+
+
+(* ::Subsection:: *)
+(*Year balance sheet*)
+
+
+CreateYearBalanceSheet[ledger_?IsLedger, incomingBalance_?IsBalances] := 
+ CreateYearBalanceSheet[{ledger}, incomingBalance]
+
+CreateYearBalanceSheet[ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
+ createYearBalanceSheetLedgerSplitByMonth[
+  splitLedgerByMonthAndYear[Join@@ledgers], 
+  incomingBalance]
+ 
+createYearBalanceSheetLedgerSplitByMonth[
+  ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
+ 1
+
+
+createAccountBalancesByMonth[ledgers : {__?IsLedger}, incoming_?IsBalances] :=
+ addIncomingAndTotal[getMonthBalances[ledgers], getAccountAssoc@incoming]
+
+getMonthBalances[ledgers : {__?IsLedger}] :=
+ getMonthShort@# -> 
+  Query[ListBankAccounts[], 1]@GetBalancesFromLedger@# & /@ ledgers // Association
+getMonthShort[ledger_?IsLedger] := DateString[ledger[1, "date"], {"MonthNameShort"}]
+
+addIncomingAndTotal[monthBalances_, incomingAccountAssoc_] := 
+ RotateRight[#, 2] & /@ (addTotalFooter[#, "Balance"] & /@ (*fixMissingIncoming /@*)
+  Query[Transpose]@RotateLeft@Prepend[monthBalances, "Incoming" -> incomingAccountAssoc])

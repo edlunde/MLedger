@@ -247,6 +247,13 @@ and association of associations (interpreted as having both row and column names
 CreateBudgetSheet::usage = "CreateBudgetSheet[ledger, budget, budgetCategories] \
 groups the expenses in ledger according to budgetCategories and compares with the \
 given budget in a budget sheet.";
+
+
+(* ::Subsection::Closed:: *)
+(*Year balance sheet*)
+
+
+CreateYearBalanceSheet::usage = "";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -841,6 +848,10 @@ With[{keys = {"account", "balance", "currency"}},
 IsAccountBalances[___] := False
 
 
+getAccountAssoc[balances_?IsBalances] :=
+ Association[Query[All, #account -> #balance &][balances[["accountBalances"]]]]
+
+
 (* ::Subsection::Closed:: *)
 (*Balances input form*)
 
@@ -1077,6 +1088,36 @@ addBudgetSummaryTable[categoriesWithBalances_] :=
        <||>]
       |>]
 (* Generalize to work with any number of category groups with whatever names *)
+
+
+(* ::Subsection::Closed:: *)
+(*Year balance sheet*)
+
+
+CreateYearBalanceSheet[ledger_?IsLedger, incomingBalance_?IsBalances] := 
+ CreateYearBalanceSheet[{ledger}, incomingBalance]
+
+CreateYearBalanceSheet[ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
+ createYearBalanceSheetLedgerSplitByMonth[
+  splitLedgerByMonthAndYear[Join@@ledgers], 
+  incomingBalance]
+ 
+createYearBalanceSheetLedgerSplitByMonth[
+  ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
+ 1
+
+
+createAccountBalancesByMonth[ledgers : {__?IsLedger}, incoming_?IsBalances] :=
+ addIncomingAndTotal[getMonthBalances[ledgers], getAccountAssoc@incoming]
+
+getMonthBalances[ledgers : {__?IsLedger}] :=
+ getMonthShort@# -> 
+  Query[ListBankAccounts[], 1]@GetBalancesFromLedger@# & /@ ledgers // Association
+getMonthShort[ledger_?IsLedger] := DateString[ledger[1, "date"], {"MonthNameShort"}]
+
+addIncomingAndTotal[monthBalances_, incomingAccountAssoc_] := 
+ RotateRight[#, 2] & /@ (addTotalFooter[#, "Balance"] & /@ (*fixMissingIncoming /@*)
+  Query[Transpose]@RotateLeft@Prepend[monthBalances, "Incoming" -> incomingAccountAssoc])
 (* ::Section::Closed:: *)
 (*Tail*)
 End[];

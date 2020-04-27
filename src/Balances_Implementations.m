@@ -28,6 +28,10 @@ With[{keys = {"account", "balance", "currency"}},
 IsAccountBalances[___] := False
 
 
+getAccountAssoc[balances_?IsBalances] :=
+ Association[Query[All, #account -> #balance &][balances[["accountBalances"]]]]
+
+
 (* ::Subsection::Closed:: *)
 (*Balances input form*)
 

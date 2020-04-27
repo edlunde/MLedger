@@ -17,3 +17,10 @@ and association of associations (interpreted as having both row and column names
 CreateBudgetSheet::usage = "CreateBudgetSheet[ledger, budget, budgetCategories] \
 groups the expenses in ledger according to budgetCategories and compares with the \
 given budget in a budget sheet.";
+
+
+(* ::Subsection:: *)
+(*Year balance sheet*)
+
+
+CreateYearBalanceSheet::usage = "";

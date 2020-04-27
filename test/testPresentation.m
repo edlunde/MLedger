@@ -77,7 +77,7 @@ AddTest[presentationCommonTestsInternal, "testAddTotalFooter",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test budget sheet*)
 
 
@@ -143,5 +143,41 @@ AddTest[budgetSheetTests, "testCreateBudgetSheet",
    AssertEquals[{10}, 
     Cases[budgetSheet, {___, "Misc.", _, x_?NumericQ, ___} :> x, All]];
   ];
+ ];
+];
+
+
+(* ::Subsection:: *)
+(*Test year balance sheet*)
+
+
+AddSuite[presentationTests, yearBalanceSheetTests];
+
+
+AddTest[yearBalanceSheetTests, "Set Up",
+ SetBankAccounts[{}];
+ AddBoAAccount/@{"BoA Checking", "BoA Savings"};
+];
+
+AddTest[yearBalanceSheetTests, "Tear Down",
+ SetBankAccounts[{}];
+];
+
+
+AddTest[yearBalanceSheetTests, "testCreateYearBalanceSheet",
+ With[{
+  ledger = CreateLedger@CreateJournal[CreateJournalEntry@@@
+    (* Create ledger with several months but only a single year *)
+    Select[exampleJournalData2, First@DateList@First@#1 == 2003 &]
+    ],
+  balances = CreateBalancesObject[exampleJournalData2[[1, 1]],
+   AssociationThread[ListBankAccounts[] -> {0.55, 0.55}]]
+  },
+  
+  AssertTrue@IsLedger@ledger;
+  AssertTrue@IsBalances@balances;
+  AssertEquals[{"BoA Checking", "BoA Savings"}, ListBankAccounts[]];
+  
+  AssertEquals[1, CreateYearBalanceSheet[ledger, balances]];
  ];
 ];
