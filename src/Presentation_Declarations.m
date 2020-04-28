@@ -23,4 +23,17 @@ given budget in a budget sheet.";
 (*Year balance sheet*)
 
 
-CreateYearBalanceSheet::usage = "";
+CreateYearBalanceSheet::usage = "CreateYearBalanceSheet[ledger, incomingBalances] \
+presents the balance for all bank accounts (taken from ListBankAccounts) together \
+with their changes by month and counting from incomingBalances, given the entries in\[NonBreakingSpace]\
+ledger. Uses GetAccountCategories[].";
+
+SetAccountCategories::usage = "SetAccountCategories[<|\"cat1\" -> {__accounts}, \
+\"cat2\" -> {__accounts}, ...|>] 
+ sets the current account categories explicitly, used for CreateYearBalanceSheet.
+SetAccountCategories[{checkingAccounts, savingsAccounts}] sets the current accounts to \
+<|\"Checking Accounts\" -> checkingAccounts, \"Savings Accounts\" -> savingsAccounts|>.";
+GetAccountCategories::usage = "GetAccountCategories[] returns the current account \
+categories, used for CreateYearBalanceSheet.
+If categories are not set, gives a warning and returns a split of ListBankAccounts[] \
+with placeholder category names.";

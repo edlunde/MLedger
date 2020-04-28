@@ -147,7 +147,7 @@ AddTest[budgetSheetTests, "testCreateBudgetSheet",
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test year balance sheet*)
 
 
@@ -157,6 +157,7 @@ AddSuite[presentationTests, yearBalanceSheetTests];
 AddTest[yearBalanceSheetTests, "Set Up",
  SetBankAccounts[{}];
  AddBoAAccount/@{"BoA Checking", "BoA Savings"};
+ MLedger`Private`resetAccountCategories[];
 ];
 
 AddTest[yearBalanceSheetTests, "Tear Down",
@@ -178,6 +179,56 @@ AddTest[yearBalanceSheetTests, "testCreateYearBalanceSheet",
   AssertTrue@IsBalances@balances;
   AssertEquals[{"BoA Checking", "BoA Savings"}, ListBankAccounts[]];
   
-  AssertEquals[1, CreateYearBalanceSheet[ledger, balances]];
+  SetAccountCategories[{{"BoA Checking"}, {"BoA Savings"}}];
+  With[{balanceSheet = 
+    CreateYearBalanceSheet[ledger, balances]},
+   AssertMatch[Labeled[Column[List[__], ___], ___], balanceSheet];
+   
+   (* Check title *)
+   AssertMatch[Labeled[___, Style["2003", ___], ___], 
+    balanceSheet];
+    
+   (* Check tables have headings *)
+   AssertEquals[
+    {"Checking Accounts", "Savings Accounts", "Summary"},
+    Cases[balanceSheet,
+     Labeled[Grid[List[List["", "Incoming", "Balance", __],__],___],
+      Style[header_String,"Subsubsection"], ___] :> header,
+     All]
+    ];
+    
+   (* Check some values *)
+   AssertEquals[{{1, -106}}, 
+    Cases[balanceSheet, {"BoA Savings", vals__?NumericQ} :> {vals}[[;;2]], All]];
+    
+   (* Check months ordered *)
+   (*AssertEquals[{"Oct", "Nov"}, 
+    Cases[balanceSheet, {"", "Incoming", "Balance", months__} \[RuleDelayed] {months}, All]];*)
+  ];
  ];
+];
+
+
+AddTest[yearBalanceSheetTests, "testSetAccountCategories",
+ (* Test behavior when not set. *)
+ Module[{defaultCategories = ""},
+  AssertMessage[GetAccountCategories::notSet,
+   defaultCategories = GetAccountCategories[]];
+  AssertEquals[
+   <|"Some accounts" -> {"BoA Checking"}, "Rest of accounts" -> {"BoA Savings"}|>, 
+   defaultCategories];
+ ];
+ 
+ (* Test just giving a split of accounts *)
+ SetAccountCategories[{{"BoA Checking"}, {"BoA Savings"}}];
+ AssertEquals[
+  <|"Checking Accounts" -> {"BoA Checking"}, "Savings Accounts" -> {"BoA Savings"}|>,
+  GetAccountCategories[]];
+  
+ (* Test explicit categories *)
+ SetAccountCategories[
+  <|"First accounts" -> {"BoA Checking", "BoA Savings"}, "No accounts" -> {}|>];
+ AssertEquals[
+  <|"First accounts" -> {"BoA Checking", "BoA Savings"}, "No accounts" -> {}|>,
+  GetAccountCategories[]];
 ];

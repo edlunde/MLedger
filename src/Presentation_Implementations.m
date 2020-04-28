@@ -145,7 +145,7 @@ addBudgetSummaryTable[categoriesWithBalances_] :=
 (* Generalize to work with any number of category groups with whatever names *)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Year balance sheet*)
 
 
@@ -156,10 +156,55 @@ CreateYearBalanceSheet[ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
  createYearBalanceSheetLedgerSplitByMonth[
   splitLedgerByMonthAndYear[Join@@ledgers], 
   incomingBalance]
+
+
+Module[{
+ accountCategories = "not set"
+ },
  
+GetAccountCategories::notSet = "Warning: Account categories not set, using \
+placeholders. Use SetAccountCategories to set up.";
+GetAccountCategories[] := 
+ If[accountCategories === "not set",
+  Message[GetAccountCategories::notSet];
+   <|"Some accounts" -> #1, "Rest of accounts" -> #2|>& @@
+    Partition[#, Ceiling[Length@#/2]]& @ ListBankAccounts[],
+  accountCategories
+ ];
+ 
+SetAccountCategories[{checkingAccounts : {__String}, savingsAccounts : {__String}}]:=
+ SetAccountCategories[<|
+  "Checking Accounts" -> checkingAccounts, 
+  "Savings Accounts" -> savingsAccounts|>];
+SetAccountCategories[categories_Association] :=
+ accountCategories = categories;
+
+resetAccountCategories[] := accountCategories = "not set"
+]
+
+
 createYearBalanceSheetLedgerSplitByMonth[
   ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
- 1
+ formatYearBalanceSheet[
+  createYearBalanceData[ledgers, incomingBalance],
+  formatYearBalanceTitle@ledgers
+  ]
+ 
+createYearBalanceData[ledgers : {__?IsLedger}, incomingBalance_?IsBalances] := 
+ createAccountBalancesByMonth[ledgers, incomingBalance] //
+  divideByAccountCategory// addYearBalanceSheetSummary
+
+formatYearBalanceTitle[ledgers : {__?IsLedger}] :=
+ DateString[ledgers[[1]][1, "date"], {"Year"}]
+
+
+formatYearBalanceSheet[yearBalanceData_, title_] :=
+ Labeled[#, Style[title, "Section"], {Top}, Spacings -> {Automatic, 2}] & @
+  Column[
+   KeyValueMap[
+    Labeled[FormattedGrid@#2, Style[#1, "Subsubsection"], {{Top,Left}}] &,
+    yearBalanceData],
+   Spacings -> 3]
 
 
 createAccountBalancesByMonth[ledgers : {__?IsLedger}, incoming_?IsBalances] :=
@@ -173,3 +218,11 @@ getMonthShort[ledger_?IsLedger] := DateString[ledger[1, "date"], {"MonthNameShor
 addIncomingAndTotal[monthBalances_, incomingAccountAssoc_] := 
  RotateRight[#, 2] & /@ (addTotalFooter[#, "Balance"] & /@ (*fixMissingIncoming /@*)
   Query[Transpose]@RotateLeft@Prepend[monthBalances, "Incoming" -> incomingAccountAssoc])
+
+
+divideByAccountCategory[accountBalances_Association] :=
+ addTotalFooter /@ DeleteMissing[Query[GetAccountCategories[]]@accountBalances, 2]
+ 
+addYearBalanceSheetSummary[categoryBalances_] := 
+ Append[categoryBalances,
+  "Summary"->addTotalFooter@Query[All, "Total"]@categoryBalances]
