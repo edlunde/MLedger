@@ -190,7 +190,7 @@ splitJournalByAccount[journal_?IsJournal] :=
  Function[acc, journal[Select[#account == acc &]]] /@ Normal@journal[Union, "account"]
 
 splitJournalByYear[journal_?IsJournal] := 
- CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]
+ Values@splitByYear@journal
 
 
 mergeJournals[journal1_?IsJournal, journal2_?IsJournal] :=

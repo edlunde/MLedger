@@ -197,7 +197,7 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test journal file handling*)
 
 
@@ -226,7 +226,7 @@ AddTest[journalFileHandlingTests, "testGetSetJournalDir",
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Internal tests*)
 
 
@@ -260,7 +260,7 @@ AddTest[journalFileHandlingTestsInternal, "testSplitJournalByYear",
  With[{journals = splitJournalByYear@exampleJournal2},
   AssertEquals[2, Length@journals];
   AssertTrue[And @@ (IsJournal /@ journals)];
-  AssertEquals[{2004, 2003}, getJournalYear /@ journals];
+  AssertEquals[{2003, 2004}, getJournalYear /@ journals];
  ];
 ];
 

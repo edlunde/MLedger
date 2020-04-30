@@ -132,7 +132,7 @@ AddTest[ledgerObjectTests, "testCreateLedgerFromLedgerLines",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*GetBalancesFromLedger tests*)
 
 

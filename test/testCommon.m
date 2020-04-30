@@ -31,6 +31,33 @@ AddTest[datesTests, "testSortByDateDescending",
  ];
 ];
 
+AddTest[datesTests, "testSplitByMonthYear",
+ With[{table = {
+  <|"a" -> 6, "b" -> 2, "date" -> "20140201"|>, 
+  <|"a" -> 3, "date" -> "20130101", "c" -> 4|>,
+  <|"date" -> "20140101", "d" -> "20140201", "b" -> 5|>}},
+  AssertTrue[And@@(KeyExistsQ[#, "date"]& /@ table)];
+  
+  AssertEquals[<|2013 -> table[[{2}]], 2014 -> table[[{1,3}]]|>, 
+   splitByYear@table];
+   
+  AssertEquals[<|2013 -> Dataset, 2014 -> Dataset|>, 
+   Head /@ splitByYear@Dataset@table];
+  AssertEquals[<|2013 -> table[[2;;2]], 2014 -> table[[{1,3}]]|>, 
+   Normal /@ splitByYear@Dataset@table];
+   
+  AssertEquals[
+   <|{2013, 1} -> table[[{2}]], {2014, 1} -> table[[{3}]], {2014, 2} -> table[[{1}]]|>, 
+   splitByMonthAndYear@table];
+   
+  AssertEquals[<|{2013, 1} -> Dataset, {2014, 1} -> Dataset, {2014, 2} -> Dataset|>, 
+   Head /@ splitByMonthAndYear@Dataset@table];
+  AssertEquals[
+   <|{2013, 1} -> table[[{2}]], {2014, 1} -> table[[{3}]], {2014, 2} -> table[[{1}]]|>, 
+   Normal /@ splitByMonthAndYear@Dataset@table];
+ ];
+];
+
 End[];(* MLedger`Private` *)
 
 

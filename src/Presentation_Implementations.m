@@ -145,7 +145,7 @@ addBudgetSummaryTable[categoriesWithBalances_] :=
 (* Generalize to work with any number of category groups with whatever names *)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Year balance sheet*)
 
 

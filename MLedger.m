@@ -253,10 +253,20 @@ given budget in a budget sheet.";
 (*Year balance sheet*)
 
 
-CreateYearBalanceSheet::usage = "";
+CreateYearBalanceSheet::usage = "CreateYearBalanceSheet[ledger, incomingBalances] \
+presents the balance for all bank accounts (taken from ListBankAccounts) together \
+with their changes by month and counting from incomingBalances, given the entries in\[NonBreakingSpace]\
+ledger. Uses GetAccountCategories[].";
 
-GetAccountCategories::usage = "";
-SetAccountCategories::usage = "";
+SetAccountCategories::usage = "SetAccountCategories[<|\"cat1\" -> {__accounts}, \
+\"cat2\" -> {__accounts}, ...|>] 
+ sets the current account categories explicitly, used for CreateYearBalanceSheet.
+SetAccountCategories[{checkingAccounts, savingsAccounts}] sets the current accounts to \
+<|\"Checking Accounts\" -> checkingAccounts, \"Savings Accounts\" -> savingsAccounts|>.";
+GetAccountCategories::usage = "GetAccountCategories[] returns the current account \
+categories, used for CreateYearBalanceSheet.
+If categories are not set, gives a warning and returns a split of ListBankAccounts[] \
+with placeholder category names.";
 (* ::Chapter:: *)
 (*Implementations*)
 Begin["`Private`"];
@@ -286,6 +296,15 @@ sortByDateDescending[list_] /; And @@ (KeyExistsQ[#, "date"] & /@ list):=
  
 getListOfDates[list_] := 
  Normal[DateList /@ list[[All, "date"]]]
+
+
+splitByYear[table_Dataset] := Dataset /@ splitByYear[Normal@table]
+splitByYear[table_] :=
+ KeySort@GroupBy[table, DateList[#[["date"]]][[1]] &]
+ 
+splitByMonthAndYear[table_Dataset] := Dataset /@ splitByMonthAndYear[Normal@table]
+splitByMonthAndYear[table_] :=
+ KeySort@GroupBy[table, DateList[#[["date"]]][[;;2]] &]
 
 
 (* ::Subsection::Closed:: *)
@@ -630,7 +649,7 @@ splitJournalByAccount[journal_?IsJournal] :=
  Function[acc, journal[Select[#account == acc &]]] /@ Normal@journal[Union, "account"]
 
 splitJournalByYear[journal_?IsJournal] := 
- CreateJournal /@ Values@Normal[Query[GroupBy[yearFromDateString@#date &]] @ journal]
+ Values@splitByYear@journal
 
 
 mergeJournals[journal1_?IsJournal, journal2_?IsJournal] :=
@@ -791,9 +810,7 @@ writeToLedgerSingleFile[ledger_?IsLedger] := (
 
 
 splitLedgerByMonthAndYear[ledger_?IsLedger] := 
- CreateLedger /@ GatherBy[Normal@ledger, getYearAndMonth]
-getYearAndMonth[ledgerLine_?isLedgerLine] :=
- DateList[ledgerLine[["date"]]][[;;2]]
+ Values@splitByMonthAndYear@ledger
 
 
 formatLedgerDirectory[year_Integer] := 
@@ -815,6 +832,8 @@ formatLedgerFilename[ledger_?IsLedger] :=
    False
   ]
  ]
+getYearAndMonth[ledgerLine_?isLedgerLine] :=
+ DateList[ledgerLine[["date"]]][[;;2]]
 
 
 ensureLedgerDirectoriesExists[ledger_?IsLedger] := 

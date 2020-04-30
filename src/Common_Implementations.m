@@ -24,6 +24,15 @@ getListOfDates[list_] :=
  Normal[DateList /@ list[[All, "date"]]]
 
 
+splitByYear[table_Dataset] := Dataset /@ splitByYear[Normal@table]
+splitByYear[table_] :=
+ KeySort@GroupBy[table, DateList[#[["date"]]][[1]] &]
+ 
+splitByMonthAndYear[table_Dataset] := Dataset /@ splitByMonthAndYear[Normal@table]
+splitByMonthAndYear[table_] :=
+ KeySort@GroupBy[table, DateList[#[["date"]]][[;;2]] &]
+
+
 (* ::Subsection:: *)
 (*Data structure functions*)
 

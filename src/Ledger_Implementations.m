@@ -79,7 +79,7 @@ setMissingDebitCreditToZero[ledger_?IsLedger] :=
  MapAt[If[# == "", 0, #] &, ledger, {{All, "debit"}, {All, "credit"}}]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Ledger file handling*)
 
 
@@ -112,9 +112,7 @@ writeToLedgerSingleFile[ledger_?IsLedger] := (
 
 
 splitLedgerByMonthAndYear[ledger_?IsLedger] := 
- CreateLedger /@ GatherBy[Normal@ledger, getYearAndMonth]
-getYearAndMonth[ledgerLine_?isLedgerLine] :=
- DateList[ledgerLine[["date"]]][[;;2]]
+ Values@splitByMonthAndYear@ledger
 
 
 formatLedgerDirectory[year_Integer] := 
@@ -136,6 +134,8 @@ formatLedgerFilename[ledger_?IsLedger] :=
    False
   ]
  ]
+getYearAndMonth[ledgerLine_?isLedgerLine] :=
+ DateList[ledgerLine[["date"]]][[;;2]]
 
 
 ensureLedgerDirectoriesExists[ledger_?IsLedger] := 

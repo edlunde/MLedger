@@ -147,7 +147,7 @@ AddTest[budgetSheetTests, "testCreateBudgetSheet",
 ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test year balance sheet*)
 
 
@@ -202,8 +202,8 @@ AddTest[yearBalanceSheetTests, "testCreateYearBalanceSheet",
     Cases[balanceSheet, {"BoA Savings", vals__?NumericQ} :> {vals}[[;;2]], All]];
     
    (* Check months ordered *)
-   (*AssertEquals[{"Oct", "Nov"}, 
-    Cases[balanceSheet, {"", "Incoming", "Balance", months__} \[RuleDelayed] {months}, All]];*)
+   AssertEquals[{{"Oct", "Nov"}}, 
+    Union@Cases[balanceSheet, {"", "Incoming", "Balance", months__} :> {months}, All]];
   ];
  ];
 ];
