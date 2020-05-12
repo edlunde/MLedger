@@ -1,5 +1,3 @@
 .DS_Store
 
-MLedger_Quickstart/Journals/
-MLedger_Quickstart/Ledger/
-MLedger_Quickstart/Balances/
+MLedger_Quickstart/Data/

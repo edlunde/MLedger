@@ -4,7 +4,7 @@
 (*Journal objects*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Journal*)
 
 
@@ -27,7 +27,8 @@ addID[entry_?IsJournalEntry] :=
   Append[entry, "id" -> 
    Hash[If[KeyExistsQ[#], entry[#]] & /@ 
     {"date", "description", "amount", "account", "FITID"},
-    "MD5"]]]
+    "MD5"]]
+]
 
 
 (* ::Subsubsection::Closed:: *)
@@ -55,7 +56,7 @@ With[{journalKeys = Sort@Keys@CreateJournalEntry[]},
 ]
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*SetCategories*)
 
 
@@ -98,7 +99,7 @@ withBalances = AddCalculatedBalances[journal, 0.55]
 withBalances2 = AddCalculatedBalances[withBalances, 1 + 0.55]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Journal file handling*)
 
 

@@ -18,6 +18,11 @@ EnsureDirectoryExists::usage =
  "EnsureDirectoryExists[dir] creates dir if it does not exist.";
 
 
+SetDataDirectories::usage = "SetDataDirectories[dir] set the various data directories \
+(using SetJournalDir etc.) to default names with dir as root (so GetJournalDir[] will \
+return dir/Journals/ etc. afterwards).";
+
+
 (* ::Subsection::Closed:: *)
 (*Data structure functions*)
 
@@ -332,6 +337,13 @@ EnsureDirectoryExists[dir_String] :=
  If[Not@FileExistsQ@dir, CreateDirectory[dir]]
 
 
+SetDataDirectories[dir_String] := {
+ SetJournalDir[FileNameJoin[{dir, "Journals"}] <> $PathnameSeparator],
+ SetLedgerDir[FileNameJoin[{dir, "Ledger"}] <> $PathnameSeparator],
+ SetBalancesDir[FileNameJoin[{dir, "Balances"}] <> $PathnameSeparator]
+ }
+
+
 importCSV[filename_String] :=
  With[{imported = Import[filename, "CSV"]},
   AssociationThread[
@@ -495,7 +507,8 @@ addID[entry_?IsJournalEntry] :=
   Append[entry, "id" -> 
    Hash[If[KeyExistsQ[#], entry[#]] & /@ 
     {"date", "description", "amount", "account", "FITID"},
-    "MD5"]]]
+    "MD5"]]
+]
 
 
 (* ::Subsubsection::Closed:: *)

@@ -8,6 +8,11 @@ EnsureDirectoryExists::usage =
  "EnsureDirectoryExists[dir] creates dir if it does not exist.";
 
 
+SetDataDirectories::usage = "SetDataDirectories[dir] set the various data directories \
+(using SetJournalDir etc.) to default names with dir as root (so GetJournalDir[] will \
+return dir/Journals/ etc. afterwards).";
+
+
 (* ::Subsection:: *)
 (*Data structure functions*)
 

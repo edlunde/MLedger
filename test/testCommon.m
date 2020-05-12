@@ -3,7 +3,7 @@
 AddSuite[MLedgerTests, commonTests];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test dates*)
 
 
@@ -61,7 +61,7 @@ AddTest[datesTests, "testSplitByMonthYear",
 End[];(* MLedger`Private` *)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test data structure functions*)
 
 
@@ -83,7 +83,7 @@ AddTest[dataStructTests, "testHasKeysQ",
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test directory handling*)
 
 
@@ -105,5 +105,15 @@ AddTest[directoryHandlingTests, "testEnsureDirectoryExists",
   AssertTrue[Not@FileExistsQ[dir]];
   EnsureDirectoryExists[dir];
   AssertTrue[FileExistsQ[dir]];
+ ];
+];
+
+AddTest[directoryHandlingTests, "testSetDataDirectories",
+ With[{dir = testDirTemp <> "tempDir/"},
+  AssertEquals[{"Balances", "Journals", "Ledger"}, 
+   Sort[FileNameTake /@ SetDataDirectories[dir]]];
+  AssertEquals[dir <> "Journals/", GetJournalDir[]];
+  AssertEquals[dir <> "Ledger/", GetLedgerDir[]];
+  AssertEquals[dir <> "Balances/", GetBalancesDir[]];
  ];
 ];

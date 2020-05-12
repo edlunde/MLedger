@@ -14,9 +14,7 @@ Get[NotebookDirectory[] <> "setupAccounts.m"]
 
 
 setupBankAccounts[]
-SetJournalDir[NotebookDirectory[] <> "Journals/"]
-SetLedgerDir[NotebookDirectory[] <> "Ledger/"]
-SetBalancesDir[NotebookDirectory[] <> "Balances/"]
+SetDataDirectories[NotebookDirectory[] <> "Data/"]
 
 
 (* ::Subsection::Closed:: *)
@@ -65,7 +63,7 @@ WriteToJournal@updatedJournal
 WriteLedgerFromJournalFiles[2003]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Input balances*)
 
 
@@ -84,8 +82,7 @@ form = BalancesInputForm["2004-01-01"]
 balances = ExtractBalances@form
 
 
-readyToWrite = 0;
-If[readyToWrite == 1, WriteToBalances@balances]
+WriteToBalances@balances
 
 
 (* ::Subsection::Closed:: *)

@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Misc.*)
 
 
@@ -10,7 +10,7 @@ messageIfNot[condition_, message_, messageArgs___] :=
  If[condition, True, Message[message, messageArgs]; False]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Dates*)
 
 
@@ -33,7 +33,7 @@ splitByMonthAndYear[table_] :=
  KeySort@GroupBy[table, DateList[#[["date"]]][[;;2]] &]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Data structure functions*)
 
 
@@ -41,12 +41,19 @@ HasKeysQ[assoc_ /; ListQ@assoc || AssociationQ@assoc , keys_] :=
  And @@ (KeyExistsQ[assoc, #] & /@ keys)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*File/Directory handling*)
 
 
 EnsureDirectoryExists[dir_String] := 
  If[Not@FileExistsQ@dir, CreateDirectory[dir]]
+
+
+SetDataDirectories[dir_String] := {
+ SetJournalDir[FileNameJoin[{dir, "Journals"}] <> $PathnameSeparator],
+ SetLedgerDir[FileNameJoin[{dir, "Ledger"}] <> $PathnameSeparator],
+ SetBalancesDir[FileNameJoin[{dir, "Balances"}] <> $PathnameSeparator]
+ }
 
 
 importCSV[filename_String] :=
