@@ -3,7 +3,7 @@
 AddSuite[MLedgerTests, categorizationTests];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test categorization form*)
 
 
@@ -47,7 +47,7 @@ AddTest[categorizationFormTests, "testExtractSelectedCategories",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
@@ -65,4 +65,77 @@ AddTest[categorizationFormTestsInternal, "testCategorizationFormRow",
    },
    categorizationFormRow@exampleEntry];
 ]];
+End[]; (* End "MLedger`Private`" *)
+
+
+(* ::Subsection:: *)
+(*Test categorization prediction*)
+
+
+AddSuite[categorizationTests, categorizationPredictionTests];
+
+
+AddTest[categorizationPredictionTests, "Set Up", 
+ exampleJournal = SetCategories[
+  CreateJournal[CreateJournalEntry@@@exampleJournalData], 
+  categoriesForExampleJournal];
+];
+
+AddTest[categorizationFormTests, "Tear Down", 
+ ClearAll@exampleJournal
+];
+
+
+AddTest[categorizationPredictionTests, "testTrainCategoryClassifier",
+ AssertTrue@IsJournal@exampleJournal;
+ With[{categories = Union@DeleteCases[categoriesForExampleJournal, ""],
+   classifierFunction = TrainCategoryClassifier[exampleJournal]},
+  AssertEquals[ClassifierFunction, Head@classifierFunction]
+  AssertEquals[categories, 
+   Sort@Information[classifierFunction, "Classes"]
+   ];
+ ];
+];
+
+
+(*Cases[FullForm@classifierFunction,
+"Index" \[Rule]  {<|"Banking fees" -> 1, "Electronics" -> 2, "Groceries" -> 3, 
+   "Insurance" -> 4, "Internal" -> 5, "Mortgage" -> 6, "Salary" -> 7|>},
+All]*)
+
+
+(* ::Subsubsection:: *)
+(*Internal tests*)
+
+
+Begin["MLedger`Private`"];
+AddSuite[categorizationPredictionTests, categorizationPredictionTestsInternal]
+
+AddTest[categorizationPredictionTestsInternal, "testTakeCategorized",
+ AssertEquals[takeCategorized, Head@takeCategorized@{1}];
+ AssertEquals[{}, takeCategorized@{}];
+
+ AssertTrue@IsJournal@exampleJournal;
+ AssertEquals[Length@DeleteCases[categoriesForExampleJournal, ""], 
+  Length@takeCategorized@exampleJournal];
+];
+
+AddTest[categorizationPredictionTestsInternal, "testTakeUnCategorized",
+ AssertEquals[takeUnCategorized, Head@takeUnCategorized@{1}];
+ AssertEquals[{}, takeUnCategorized@{}];
+
+ AssertTrue@IsJournal@exampleJournal;
+ AssertEquals[Count[categoriesForExampleJournal, ""], 
+  Length@takeUnCategorized@exampleJournal];
+];
+
+AddTest[categorizationPredictionTestsInternal, "testFeatureKeys",
+ AssertEquals[{"account", "amount", "description"}, Sort@featureKeys[]];
+];
+
+AddTest[categorizationPredictionTestsInternal, "testFormatTrainingData",
+ AssertTrue@IsJournal@exampleJournal;
+ AssertMatch[{({__} -> _)..}, formatTrainingData[takeCategorized@exampleJournal]];
+ AssertEquals[-710.49, formatTrainingData[takeCategorized@exampleJournal][[3, 1, 2]]];
+];
 End[]; (* End "MLedger`Private`" *)

@@ -32,3 +32,25 @@ getCategories[entry_?IsJournalEntry] := {entry[["category"]]}
 
 ExtractSelectedCategories[categorizationForm_] :=
  Cases[categorizationForm, InputField[_[category_], __] :> category, All]
+
+
+(* ::Subsection:: *)
+(*Categorization prediction*)
+
+
+TrainCategoryClassifier[journal_?IsJournal] :=
+ Classify@formatTrainingData@takeCategorized@journal
+
+
+formatTrainingData[journal_?IsJournal] := 
+ (* #1 becomes "category" due to Prepend *)
+ {##2} -> #1 & @@@ Normal@journal[All, Prepend[featureKeys[], "category"]]
+ 
+featureKeys[] := {"description", "amount", "account"}
+
+
+takeCategorized[{}] := {}
+takeCategorized[journal_?IsJournal] := journal[Select[#category != "" &]]
+
+takeUnCategorized[{}] := {}
+takeUnCategorized[journal_?IsJournal] := journal[Select[#category == "" &]]

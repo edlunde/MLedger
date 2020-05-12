@@ -53,7 +53,7 @@ exampleBalanceData = {"2003-10-09",
   };
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Budget*)
 
 

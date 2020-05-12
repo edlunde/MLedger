@@ -149,6 +149,15 @@ CategorizationForm::usage = "CategorizationForm[journal] sets up a form for fill
 out categories for a journal.";
 ExtractSelectedCategories::usage = "ExtractSelectedCategories[form] extracts the \
 chosen categories from a CategorizationForm.";
+
+
+(* ::Subsection::Closed:: *)
+(*Categorization prediction*)
+
+
+TrainCategoryClassifier::usage = "TrainCategoryClassifier[journal] returns a \
+PredictionFunction trained to predict the category of a transaction from its \
+description, amount, and account.";
 (* ::Section:: *)
 (*Ledger*)
 (* ::Package:: *)
@@ -694,6 +703,28 @@ getCategories[entry_?IsJournalEntry] := {entry[["category"]]}
 
 ExtractSelectedCategories[categorizationForm_] :=
  Cases[categorizationForm, InputField[_[category_], __] :> category, All]
+
+
+(* ::Subsection::Closed:: *)
+(*Categorization prediction*)
+
+
+TrainCategoryClassifier[journal_?IsJournal] :=
+ Classify@formatTrainingData@takeCategorized@journal
+
+
+formatTrainingData[journal_?IsJournal] := 
+ (* #1 becomes "category" due to Prepend *)
+ {##2} -> #1 & @@@ Normal@journal[All, Prepend[featureKeys[], "category"]]
+ 
+featureKeys[] := {"description", "amount", "account"}
+
+
+takeCategorized[{}] := {}
+takeCategorized[journal_?IsJournal] := journal[Select[#category != "" &]]
+
+takeUnCategorized[{}] := {}
+takeUnCategorized[journal_?IsJournal] := journal[Select[#category == "" &]]
 (* ::Section:: *)
 (*Ledger*)
 (* ::Package:: *)
