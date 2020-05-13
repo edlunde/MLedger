@@ -112,6 +112,10 @@ of categories with equal length and sets the \"category\"-field of the journal's
 entries to the given categories.";
 
 
+ResetIDs::usage = "ResetIDs[journal] recalculates the hash used to identify journal \
+entries.";
+
+
 AddCalculatedBalances::usage = "AddCalculatedBalances[journal, incomingBalance] \
 calculates and adds a field calcBalance to the given journal assuming the balance \
 before first entry was incomingBalance.git";
@@ -548,6 +552,13 @@ SetCategories[journalIn_?IsJournal, categories_List] /; messageIfNot[
  Module[{journal = Normal@journalIn}, 
   journal[[All, "category"]] = categories;
   Dataset@journal]
+
+
+(* ::Subsubsection::Closed:: *)
+(*ResetIDs*)
+
+
+ResetIDs[journal_] := CreateJournal[KeyDrop[#, "id"]& /@ Normal@journal]
 
 
 (* ::Subsubsection::Closed:: *)

@@ -131,6 +131,24 @@ AddTest[journalObjectsTests, "testSetCategories",
 
 
 (* ::Subsubsection::Closed:: *)
+(*ResetIDs*)
+
+
+AddTest[journalObjectsTests, "testResetIDs",
+ With[{journal = CreateJournal[CreateJournalEntry@@@exampleJournalData]},
+  Module[{journal2 = Dataset@MapAt[321 &, Normal@journal, {3, "amount"}]},
+   AssertTrue@IsJournal@journal2;
+   AssertEquals[321, journal2[3, "amount"]];
+   (* Check this will be a sharp test *)
+   AssertEquals[journal[3, "id"], journal2[3, "id"]];
+   AssertTrue@IsJournal@ResetIDs@journal2;
+   AssertTrue[journal[3, "id"] != ResetIDs[journal2][3, "id"]];
+  ];
+ ];
+];
+
+
+(* ::Subsubsection::Closed:: *)
 (*AddCalculatedBalances*)
 
 
@@ -197,7 +215,7 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Test journal file handling*)
 
 
@@ -226,7 +244,7 @@ AddTest[journalFileHandlingTests, "testGetSetJournalDir",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 

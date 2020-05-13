@@ -70,6 +70,13 @@ SetCategories[journalIn_?IsJournal, categories_List] /; messageIfNot[
   Dataset@journal]
 
 
+(* ::Subsubsection:: *)
+(*ResetIDs*)
+
+
+ResetIDs[journal_] := CreateJournal[KeyDrop[#, "id"]& /@ Normal@journal]
+
+
 (* ::Subsubsection::Closed:: *)
 (*AddCalculatedBalances*)
 
