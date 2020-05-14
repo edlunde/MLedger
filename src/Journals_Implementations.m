@@ -25,7 +25,7 @@ addIDs[journal_?IsJournal] := (
 addID[entry_?IsJournalEntry] := 
  If[KeyExistsQ[entry, "id"], entry,
   Append[entry, "id" -> 
-   Hash[If[KeyExistsQ[#], entry[#]] & /@ 
+   Hash[If[KeyExistsQ[entry, #], entry[#]] & /@ 
     {"date", "description", "amount", "account", "FITID"},
     "MD5"]]
 ]

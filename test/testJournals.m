@@ -208,9 +208,9 @@ AddTest[journalObjectsTests, "testAddCalculatedBalancesRounding",
 Begin["MLedger`Private`"];
 AddSuite[journalObjectsTests, journalObjectsTestsInternal]
 AddTest[journalObjectsTestsInternal, "testAddIDs",
- AssertEquals[<|CreateJournalEntry[], "id"->28496656361855733621011000650886999167|>,
+ AssertEquals[<|CreateJournalEntry[], "id"->119425892664861902967123551446002477177|>,
   addID@CreateJournalEntry[]];
- AssertEquals[<|CreateJournalEntry[], "id"->28496656361855733621011000650886999167|>,
+ AssertEquals[<|CreateJournalEntry[], "id"->119425892664861902967123551446002477177|>,
   addID@addID@CreateJournalEntry[]];
   
  AssertMessage[
@@ -219,14 +219,28 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
   
  AssertTrue[
   And@@(KeyExistsQ[#, "id"] & /@ addIDs@Dataset[{CreateJournalEntry[]}])];
+  
  (* Check FITID is used when present *)
  With[{entry = CreateJournalEntry[
    {2003, 10, 14}, "Payroll Deposit - HOTEL", 694.81, 695.36, 
     "testAccount", "USD", "Hotel", "FITID" -> 1234]},
-  AssertEquals[43520287855825489889128932694485169284, 
-   addID[KeyDrop[entry, "FITID"]]["id"]]; (* Without FITID *)
-  AssertEquals[189748608173027501958982806065933508219, 
-   addID[entry]["id"]]; (* With FITID *)
+  (* Without FITID *)
+  AssertEquals[209301251017031479487551913485260210694, 
+   addID[KeyDrop[entry, "FITID"]]["id"]];
+  (* With FITID *)
+  AssertEquals[57290321703453810724647628122176071905, 
+   addID[entry]["id"]];
+ ];
+ 
+ (* Check correctly considers equal entries differing in keys not supposed to go 
+     into hash calculation *)
+ Module[{entry1, entry2},
+  entry1 = CreateJournalEntry[
+   {2003, 10, 14}, "Payroll Deposit - HOTEL", 694.81, 695.36, 
+    "testAccount", "USD", "Hotel", "FITID" -> 1234];
+  entry2 = entry1; entry2[["balance"]] = 0.;
+  AssertTrue@IsJournalEntry@entry2;
+  AssertEquals[addID[entry2]["id"], addID[entry1]["id"]];
  ];
 ];
 End[]; (* End "MLedger`Private`" *)
