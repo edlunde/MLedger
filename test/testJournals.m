@@ -215,11 +215,15 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test journal file handling*)
 
 
 AddSuite[journalsTests, journalFileHandlingTests];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Setup/Teardown*)
 
 
 AddTest[journalFileHandlingTests, "Set Up", 
@@ -235,6 +239,10 @@ AddTest[journalFileHandlingTests, "Tear Down",
  ClearAll[testDirTemp, exampleJournal, exampleJournal2];
  SetJournalDir[""];
 ];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Get/SetJournalDir*)
 
 
 AddTest[journalFileHandlingTests, "testGetSetJournalDir",
@@ -392,4 +400,11 @@ AddTest[readWriteJournalTests, "testListAccountsWithJournals",
  
  SetBankAccounts[{<|"name" -> "BoA Checking"|>, <|"name" -> "BoA Savings"|>}];
  AssertEquals[{"BoA Checking", "BoA Savings"}, Sort@ListAccountsWithJournals[]];
+ 
+ (* Check no warning on hidden files *)
+ With[{hiddenFile = GetJournalDir[] <> ".hidden"},
+  CreateFile@hiddenFile;
+  AssertTrue@FileExistsQ@hiddenFile;
+  AssertNoMessage[ListAccountsWithJournals[]];
+ ];
 ];

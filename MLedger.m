@@ -603,7 +603,7 @@ Module[{journalDir = ""},
 ListAccountsWithJournals::extraFiles = "Warning: found files not recognized as beloning \
 to journals - `1`";
 ListAccountsWithJournals[] :=
- With[{journalFolders = FileNameTake /@ FileNames[All, GetJournalDir[]]},
+ With[{journalFolders = FileNameTake /@ FileNames[Except["."] ~~ __, GetJournalDir[]]},
   messageIfNot[Not@MemberQ[journalFolders, x_ /; Not@BankAccountNameQ@x],
    ListAccountsWithJournals::extraFiles, 
    Select[journalFolders, Not@BankAccountNameQ@# &]
