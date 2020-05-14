@@ -184,6 +184,23 @@ AddTest[journalObjectsTests, "testAddCalculatedBalances",
 ];
 
 
+AddTest[journalObjectsTests, "testAddCalculatedBalancesRounding",
+ Module[{amounts, jEntries, journal},
+  amounts = 
+   {3003.1, -13.68, -1161.04, -1126., 7150.15, -25., -1212., -106.82, -80., 
+    -5000., -16., 7248., -1200., -1200., 2400.};
+  jEntries = CreateJournalEntry@@@exampleJournalData[[;; Length@amounts]];
+  jEntries[[All, "amount"]] = amounts;
+  journal = AddCalculatedBalances[CreateJournal@jEntries, 0];
+  AssertEquals[
+   "8660.71,5657.61,5671.29,6832.33,7958.33,808.18,833.18,2045.18,2152.," <> 
+     "2232.,7232.,7248.,0.,1200.,2400.\n",
+   ExportString[journal[[All,"calcBalance"]], "CSV"]
+  ];
+ ];
+];
+
+
 (* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
@@ -383,6 +400,10 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
   AssertEquals[{-5., -5., 123}, Sort@Normal@journalRead[[;;3, "amount"]]];
  ];
 ];
+
+
+(* ::Subsubsection::Closed:: *)
+(*ListAccountsWithJournals*)
 
 
 AddTest[readWriteJournalTests, "testListAccountsWithJournals",

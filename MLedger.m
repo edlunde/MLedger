@@ -581,13 +581,21 @@ calcBalancePosition[entry_?IsJournalEntry] :=
  ]
  
 calculateBalances[journal_?IsJournal, incomingBalance_?NumericQ] := 
-  (journal[Reverse, "amount"] // Normal // Accumulate // Reverse) + incomingBalance
+  (journal[Reverse, "amount"] // Normal // Accumulate // Reverse) + incomingBalance //
+   specialRound
 
-
-withBalances = AddCalculatedBalances[journal, 0.55]
-
-
-withBalances2 = AddCalculatedBalances[withBalances, 1 + 0.55]
+(* 
+Can't get Round to chop off digits from accumulated rounding errors for some reason:
+ ExportString[808.1800000000001, "CSV"] \[Rule] "808.1800000000001"
+ ExportString[Round[808.1800000000001, 0.0001], "CSV"] \[Rule] "808.1800000000001"
+ ExportString[specialRound[808.1800000000001], "CSV"] \[Rule] "808.18"
+*)
+SetAttributes[specialRound, Listable];
+With[{nDecimalsToKeep = 4},
+specialRound[r_?NumericQ] :=
+ N@Round[#, 10^(-nDecimalsToKeep)]& @
+  Total[Take[NumberExpand@r, 1 + nDecimalsToKeep + Last@MantissaExponent@r]]
+]
 
 
 (* ::Subsection::Closed:: *)
