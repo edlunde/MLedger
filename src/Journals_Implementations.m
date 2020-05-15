@@ -114,6 +114,17 @@ specialRound[r_?NumericQ] :=
 ]
 
 
+(* ::Subsubsection:: *)
+(*TakeCategorized*)
+
+
+TakeCategorized[{}] := {}
+TakeCategorized[journal_?IsJournal] := journal[Select[#category != "" &]]
+
+TakeUncategorized[{}] := {}
+TakeUncategorized[journal_?IsJournal] := journal[Select[#category == "" &]]
+
+
 (* ::Subsection::Closed:: *)
 (*Journal file handling*)
 

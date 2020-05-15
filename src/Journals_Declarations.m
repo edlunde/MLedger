@@ -31,6 +31,12 @@ calculates and adds a field calcBalance to the given journal assuming the balanc
 before first entry was incomingBalance.git";
 
 
+TakeCategorized::usage = "TakeCategorized[journal] returns the journal with only \
+the entries with a non-empty category field. Cf TakeUncategorized";
+TakeUncategorized::usage = "TakeUncategorized[journal] returns the journal with only \
+the entries with an empty category field. Cf TakeCategorized";
+
+
 (* ::Subsection:: *)
 (*Journal file handling*)
 

@@ -121,6 +121,12 @@ calculates and adds a field calcBalance to the given journal assuming the balanc
 before first entry was incomingBalance.git";
 
 
+TakeCategorized::usage = "TakeCategorized[journal] returns the journal with only \
+the entries with a non-empty category field. Cf TakeUncategorized";
+TakeUncategorized::usage = "TakeUncategorized[journal] returns the journal with only \
+the entries with an empty category field. Cf TakeCategorized";
+
+
 (* ::Subsection::Closed:: *)
 (*Journal file handling*)
 
@@ -598,6 +604,17 @@ specialRound[r_?NumericQ] :=
 ]
 
 
+(* ::Subsubsection::Closed:: *)
+(*TakeCategorized*)
+
+
+TakeCategorized[{}] := {}
+TakeCategorized[journal_?IsJournal] := journal[Select[#category != "" &]]
+
+TakeUncategorized[{}] := {}
+TakeUncategorized[journal_?IsJournal] := journal[Select[#category == "" &]]
+
+
 (* ::Subsection::Closed:: *)
 (*Journal file handling*)
 
@@ -742,7 +759,7 @@ ExtractSelectedCategories[categorizationForm_] :=
 
 
 TrainCategoryClassifier[journal_?IsJournal] :=
- Classify@formatTrainingData@takeCategorized@journal
+ Classify@formatTrainingData@TakeCategorized@journal
 
 
 formatTrainingData[journal_?IsJournal] := 
@@ -750,13 +767,6 @@ formatTrainingData[journal_?IsJournal] :=
  {##2} -> #1 & @@@ Normal@journal[All, Prepend[featureKeys[], "category"]]
  
 featureKeys[] := {"description", "amount", "account"}
-
-
-takeCategorized[{}] := {}
-takeCategorized[journal_?IsJournal] := journal[Select[#category != "" &]]
-
-takeUnCategorized[{}] := {}
-takeUnCategorized[journal_?IsJournal] := journal[Select[#category == "" &]]
 (* ::Section:: *)
 (*Ledger*)
 (* ::Package:: *)

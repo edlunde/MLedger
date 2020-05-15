@@ -39,7 +39,7 @@ ExtractSelectedCategories[categorizationForm_] :=
 
 
 TrainCategoryClassifier[journal_?IsJournal] :=
- Classify@formatTrainingData@takeCategorized@journal
+ Classify@formatTrainingData@TakeCategorized@journal
 
 
 formatTrainingData[journal_?IsJournal] := 
@@ -47,10 +47,3 @@ formatTrainingData[journal_?IsJournal] :=
  {##2} -> #1 & @@@ Normal@journal[All, Prepend[featureKeys[], "category"]]
  
 featureKeys[] := {"description", "amount", "account"}
-
-
-takeCategorized[{}] := {}
-takeCategorized[journal_?IsJournal] := journal[Select[#category != "" &]]
-
-takeUnCategorized[{}] := {}
-takeUnCategorized[journal_?IsJournal] := journal[Select[#category == "" &]]

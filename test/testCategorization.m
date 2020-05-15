@@ -90,7 +90,7 @@ AddTest[categorizationPredictionTests, "testTrainCategoryClassifier",
  AssertTrue@IsJournal@exampleJournal;
  With[{categories = Union@DeleteCases[categoriesForExampleJournal, ""],
    classifierFunction = TrainCategoryClassifier[exampleJournal]},
-  AssertEquals[ClassifierFunction, Head@classifierFunction]
+  AssertEquals[ClassifierFunction, Head@classifierFunction];
   AssertEquals[categories, 
    Sort@Information[classifierFunction, "Classes"]
    ];
@@ -104,30 +104,12 @@ AddTest[categorizationPredictionTests, "testTrainCategoryClassifier",
 All]*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
 
 Begin["MLedger`Private`"];
 AddSuite[categorizationPredictionTests, categorizationPredictionTestsInternal]
-
-AddTest[categorizationPredictionTestsInternal, "testTakeCategorized",
- AssertEquals[takeCategorized, Head@takeCategorized@{1}];
- AssertEquals[{}, takeCategorized@{}];
-
- AssertTrue@IsJournal@exampleJournal;
- AssertEquals[Length@DeleteCases[categoriesForExampleJournal, ""], 
-  Length@takeCategorized@exampleJournal];
-];
-
-AddTest[categorizationPredictionTestsInternal, "testTakeUnCategorized",
- AssertEquals[takeUnCategorized, Head@takeUnCategorized@{1}];
- AssertEquals[{}, takeUnCategorized@{}];
-
- AssertTrue@IsJournal@exampleJournal;
- AssertEquals[Count[categoriesForExampleJournal, ""], 
-  Length@takeUnCategorized@exampleJournal];
-];
 
 AddTest[categorizationPredictionTestsInternal, "testFeatureKeys",
  AssertEquals[{"account", "amount", "description"}, Sort@featureKeys[]];
@@ -135,7 +117,7 @@ AddTest[categorizationPredictionTestsInternal, "testFeatureKeys",
 
 AddTest[categorizationPredictionTestsInternal, "testFormatTrainingData",
  AssertTrue@IsJournal@exampleJournal;
- AssertMatch[{({__} -> _)..}, formatTrainingData[takeCategorized@exampleJournal]];
- AssertEquals[-710.49, formatTrainingData[takeCategorized@exampleJournal][[3, 1, 2]]];
+ AssertMatch[{({__} -> _)..}, formatTrainingData[TakeCategorized@exampleJournal]];
+ AssertEquals[-710.49, formatTrainingData[TakeCategorized@exampleJournal][[3, 1, 2]]];
 ];
 End[]; (* End "MLedger`Private`" *)

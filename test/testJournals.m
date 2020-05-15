@@ -201,6 +201,33 @@ AddTest[journalObjectsTests, "testAddCalculatedBalancesRounding",
 ];
 
 
+(* ::Subsubsection:: *)
+(*TakeCategorized*)
+
+
+AddTest[categorizationPredictionTestsInternal, "testTakeCategorized",
+ With[{exampleJournal = CreateJournal[CreateJournalEntry@@@exampleJournalData]},
+  AssertEquals[TakeCategorized, Head@TakeCategorized@{1}];
+  AssertEquals[{}, TakeCategorized@{}];
+  
+  AssertTrue@IsJournal@exampleJournal;
+  AssertEquals[Length@DeleteCases[categoriesForExampleJournal, ""], 
+   Length@TakeCategorized@exampleJournal];
+ ];
+];
+
+AddTest[categorizationPredictionTestsInternal, "testTakeUncategorized",
+ With[{exampleJournal = CreateJournal[CreateJournalEntry@@@exampleJournalData]},
+  AssertEquals[TakeUncategorized, Head@TakeUncategorized@{1}];
+  AssertEquals[{}, TakeUncategorized@{}];
+
+  AssertTrue@IsJournal@exampleJournal;
+  AssertEquals[Count[categoriesForExampleJournal, ""], 
+   Length@TakeUncategorized@exampleJournal];
+ ];
+];
+
+
 (* ::Subsubsection::Closed:: *)
 (*Internal tests*)
 
@@ -237,8 +264,11 @@ AddTest[journalObjectsTestsInternal, "testAddIDs",
  Module[{entry1, entry2},
   entry1 = CreateJournalEntry[
    {2003, 10, 14}, "Payroll Deposit - HOTEL", 694.81, 695.36, 
-    "testAccount", "USD", "Hotel", "FITID" -> 1234];
+   "testAccount", "USD", "Hotel"];
   entry2 = entry1; entry2[["balance"]] = 0.;
+  AssertTrue@IsJournalEntry@entry2;
+  AssertEquals[addID[entry2]["id"], addID[entry1]["id"]];
+  entry2 = entry1; entry2[["category"]] = "not Hotel";
   AssertTrue@IsJournalEntry@entry2;
   AssertEquals[addID[entry2]["id"], addID[entry1]["id"]];
  ];
