@@ -59,35 +59,74 @@ AddTest[journalObjectsTests, "testCreateJournal",
 
 AddTest[journalObjectsTests, "testCreateJournalEntry",
  AssertEquals[
-  <|"date"->"1-01-01", "description"->"", "amount"->0.`, "balance"->0.`,
-    "account"->"", "currency"->"", "category"->""|>,
+  <|"date" -> "1-01-01", "description" -> "", "amount" -> 0.`, "balance" -> 0.`,
+    "account" -> "", "currency" -> "", "category" -> ""|>,
   CreateJournalEntry[]];
  AssertEquals[
-  <|"date"->"1-01-01", "description"->"", "amount"->0.`, "balance"->0.`,
-    "account"->"", "currency"->"", "category"->""|>,
+  <|"date" -> "1-01-01", "description" -> "", "amount" -> 0.`, "balance" -> 0.`,
+    "account" -> "", "currency" -> "", "category" -> ""|>,
   CreateJournalEntry[{}]];
  
  AssertEquals[
-  <|"date"->"2003-10-14", "description"->"Payroll Deposit - HOTEL", 
-    "amount"->694.81, "balance"->695.36,
-    "account"->"testAccount", "currency"->"USD", "category"->"Hotel"|>,
+  <|"date" -> "2003-10-14", "description" -> "Payroll Deposit - HOTEL", 
+    "amount" -> 694.81, "balance" -> 695.36,
+    "account" -> "testAccount", "currency" -> "USD", "category" -> "Hotel"|>,
   CreateJournalEntry[
    {2003, 10, 14}, "Payroll Deposit - HOTEL", 694.81, 695.36, 
     "testAccount", "USD", "Hotel"]];
     
  (* With extra info, here FITID from BoA to be used in calculating id *) 
  AssertEquals[
-  <|"date"->"2003-10-14", "description"->"Payroll Deposit - HOTEL", 
-    "amount"->694.81, "balance"->695.36,
-    "account"->"testAccount", "currency"->"USD", "category"->"Hotel", "FITID" -> 1234|>,
+  <|"date" -> "2003-10-14", "description" -> "Payroll Deposit - HOTEL", 
+    "amount" -> 694.81, "balance" -> 695.36, "account" -> "testAccount", 
+    "currency" -> "USD", "category" -> "Hotel", "FITID"  ->  1234|>,
   CreateJournalEntry[
    {2003, 10, 14}, "Payroll Deposit - HOTEL", 694.81, 695.36, 
-    "testAccount", "USD", "Hotel", "FITID" -> 1234]];
+    "testAccount", "USD", "Hotel", "FITID"  ->  1234]];
  
  (* Check we can use CreateJournalEntry on JournalEntries *)
  AssertEquals[CreateJournalEntry[], CreateJournalEntry@CreateJournalEntry[]];
+ (* Check extra info handled in this case *)
+ AssertEquals[
+  <|"date" -> "2003-10-14", "description" -> "Payroll Deposit - HOTEL", 
+    "amount" -> 694.81, "balance" -> 695.36, "account" -> "testAccount", 
+    "currency" -> "USD", "category" -> "Hotel", 
+    "FITID"  ->  1234, "otherExtra" -> "4321"|>,
+  CreateJournalEntry[
+   <|"date" -> "2003-10-14", "description" -> "Payroll Deposit - HOTEL", 
+    "amount" -> 694.81, "balance" -> 695.36, "account" -> "testAccount", 
+    "currency" -> "USD", "category" -> "Hotel", 
+    "FITID"  ->  1234, "otherExtra" -> "4321"|>]];
 ];
 
+AddTest[journalObjectsTests, "testCreateJournalEntryTrimAndToString",
+ (* Check leading/trailing whitespace removed on strings *)
+ AssertEquals[
+  <|"date" -> "2003-10-14", "description" -> "Payroll Deposit - HOTEL", 
+    "amount" -> 694.81, "balance" -> 695.36,
+    "account" -> "testAccount", "currency" -> "USD", "category" -> "Hotel"|>, 
+  CreateJournalEntry[
+   {2003, 10, 14}, " Payroll Deposit - HOTEL ", 694.81, 695.36, 
+    "testAccount", "USD", " Hotel "]];
+ (* Check numerics turned into strings for fields where strings are expected *)
+ AssertEquals[
+  <|"date" -> "2003-10-14", "description" -> "51324", 
+    "amount" -> 694.81, "balance" -> 695.36,
+    "account" -> "43", "currency" -> "USD", "category" -> "12"|>, 
+  CreateJournalEntry[
+   {2003, 10, 14}, 51324, 694.81, 695.36, 
+    43, "USD", 12]];
+(* Check this works for associations already on journalEntry-form
+    (important when loading data from journal files that contain numeric descriptions) *)
+ AssertEquals[
+  <|"date" -> "2003-10-14", "description" -> "51324", 
+    "amount" -> 694.81, "balance" -> 695.36,
+    "account" -> "43", "currency" -> "USD", "category" -> "12"|>, 
+  CreateJournalEntry[
+   <|"date" -> "2003-10-14", "description" -> 51324, 
+    "amount" -> 694.81, "balance" -> 695.36,
+    "account" -> 43, "currency" -> "USD", "category" -> 12|>]];
+];
 
 
 AddTest[journalObjectsTests, "testIsJournalEntry",
@@ -201,7 +240,7 @@ AddTest[journalObjectsTests, "testAddCalculatedBalancesRounding",
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*TakeCategorized*)
 
 
