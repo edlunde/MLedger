@@ -153,13 +153,16 @@ AddTest[BoATests, "testAddBoAAccount",
 Begin["MLedger`Private`"];
 AddSuite[BoATests, BoATestsInternal];
 
-AddTest[BoATestsInternal, "testBoAFilePattern",
- AssertTrue[StringMatchQ["stmt.txt", BoAFilePattern]];
- AssertTrue[StringMatchQ["stmt0.txt", BoAFilePattern]];
- AssertTrue[StringMatchQ["stmt (copy).txt", BoAFilePattern]];
+AddTest[BoATestsInternal, "testfilePatternBoA",
+ AssertTrue[StringMatchQ["stmt.txt", filePatternBoA]];
+ AssertTrue[StringMatchQ["stmt0.txt", filePatternBoA]];
+ AssertTrue[StringMatchQ["stmt (copy).txt", filePatternBoA]];
+ AssertTrue[StringMatchQ["stmt.qfx", filePatternBoA]];
+ AssertTrue[StringMatchQ["stmt0.qfx", filePatternBoA]];
+ AssertTrue[StringMatchQ["stmt (copy).qfx", filePatternBoA]];
 ];
 
-AddTest[BoATestsInternal, "testImportBoA",
+AddTest[BoATestsInternal, "testImportBoAtxt",
  With[{filename = testFilesDir <> "stmt.txt"},
   AssertTrue[Length@FileNames[filename] > 0];
   With[{imported = importBoA[filename, "BoATestAcc"]},
@@ -180,6 +183,32 @@ AddTest[BoATestsInternal, "testImportBoA",
      <|"date" -> "2003-11-03", "amount" -> -100.,   "balance" -> 648.02|>,
      <|"date" -> "2003-11-03", "amount" -> -33.55,  "balance" -> 748.02 |>},
     Normal@imported[[3;;5, {"date", "amount", "balance"}]]];
+  ];
+ ];
+];
+
+AddTest[BoATestsInternal, "testImportBoAqfx",
+ With[{filename = testFilesDir <> "bank_medium.qfx"},
+  AssertTrue[Length@FileNames[filename] > 0];
+  With[{imported = importBoA[filename, "BoATestAcc"]},
+   AssertTrue[IsJournal@imported];
+   AssertEquals[3, Length@imported];
+   
+   (* Check one of each field *)
+   AssertEquals["2009-04-01", imported[[1, "date"]]];
+   AssertEquals["Joe's Bald Hairstyles", imported[[2, "description"]]];
+   AssertEquals[-22., imported[[3, "amount"]]];
+   AssertEquals[0., imported[[1, "balance"]]];
+   AssertEquals["BoATestAcc", imported[[1, "account"]]];
+   AssertEquals["USD", imported[[1, "currency"]]];
+   AssertEquals["0000123456782009040100001", imported[[1, "FITID"]]];
+   
+   (*(* Check sorted by date descending and order correct for balances *)
+   AssertEquals[
+    {<|"date" -> "2003-11-06", "amount" -> -710.49, "balance" -> -62.47|>,
+     <|"date" -> "2003-11-03", "amount" -> -100.,   "balance" -> 648.02|>,
+     <|"date" -> "2003-11-03", "amount" -> -33.55,  "balance" -> 748.02 |>},
+    Normal@imported[[3;;5, {"date", "amount", "balance"}]]];*)
   ];
  ];
 ];

@@ -68,13 +68,23 @@ importFile[fileName_String, accountName_String] /; Not@importableFileQ@fileName 
 
 
 AddBoAAccount[accountName_String] := 
- AddBankAccount[accountName, "USD", BoAFilePattern, importBoA]
+ AddBankAccount[accountName, "USD", filePatternBoA, importBoA]
 
 
-BoAFilePattern = "stmt" ~~ ___ ~~ ".txt";
+filePatternBoA := (*Alternatives @@ *)fileTypesBoA[[All, 1]];
+fileTypesBoA = 
+ {{txtPatternBoA, importBoAtxt}, 
+  {qfxPatternBoA, importBoAqfx}};
+importBoA[fileName_String, account_String] := 
+ With[{importFunction = 
+  Select[fileTypesBoA, StringMatchQ[FileNameTake@fileName, #[[1]]] &][[1, 2]]
+  },
+  importFunction[fileName, account]
+ ]
 
 
-importBoA[filename_String, account_String] := 
+txtPatternBoA = "stmt" ~~ ___ ~~ ".txt";
+importBoAtxt[filename_String, account_String] := 
  CreateJournal[
   handleBoALine[account] /@ Reverse@extractTableBoA@Import[filename]]
  
@@ -93,6 +103,37 @@ handleBoALine[
     ]
 numberStringQ[str_String] := StringMatchQ[str, NumberString]
 numberStringQ[obj___] := False
+
+
+qfxPatternBoA = ___ ~~ ".qfx";
+importBoAqfx[filename_String, account_String] := 
+ CreateJournal[
+  CreateJournalEntry[##2, 0.0, account, "USD", "", "FITID" -> #1] & @@@ (
+   getXMLpart[Import[filename]] // addEndTags // 
+    XML`Parser`XMLGetString // extractTransactions
+   )
+ ]
+(* not tested individually *)
+getXMLpart[str_String] := StringReplace[str, ___ ~~ xml : ("<OFX>" ~~ ___) :> xml]
+getXMLpart[notString_] := 
+ (* Sometimes Import on qfx doesn't give string as element, this probably fixes... *)
+ getXMLpart@StringReplace[ToString@notString, 
+  {"}, {" -> "\n", "{{" -> "", "}}" -> ""}]
+
+addEndTags[str_String] := StringReplace[str, 
+  white : WhitespaceCharacter... ~~ 
+   "<" ~~ tag : Except[">"].. ~~ ">" ~~ 
+   elem : Except["\n"]..
+  :> white ~~ "<" ~~ tag ~~ ">" ~~ elem ~~ "</" ~~ tag ~~ ">"
+]
+extractTransactions[xml : XMLObject["Document"][__]] := Cases[xml,
+ XMLElement["STMTTRN", {}, 
+    {___, XMLElement["DTPOSTED", {}, {time_}], ___,
+     XMLElement["TRNAMT", {}, {amount_}], ___,
+     XMLElement["FITID", {}, {FITID_}], ___,
+     XMLElement["NAME",{},{description_}],___}] :> 
+   {FITID, DateList[StringTake[time, 8]][[ ;; 3]], description,
+    ToExpression@StringReplace[amount, "," -> ""]}, Infinity]
 
 
 (* ::Subsubsection::Closed:: *)
