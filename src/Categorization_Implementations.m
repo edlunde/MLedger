@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Categorization form*)
 
 
@@ -16,7 +16,7 @@ addCategorizationFormHeader[account_String, form_] :=
    (most important part of course, but requires some arcane workaround to get right
    behavior when run without notebook?) *)
 categorizationFormRow[entry_?IsJournalEntry] :=
- With[{category = Unique@"category", fieldSize = 11},
+ With[{category = Unique@"category", fieldSize = 15},
   Join[
    Values[entry[[{"date", "description", "amount"}]]], 
    {
@@ -34,7 +34,7 @@ ExtractSelectedCategories[categorizationForm_] :=
  Cases[categorizationForm, InputField[_[category_], __] :> category, All]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Categorization prediction*)
 
 
