@@ -405,7 +405,7 @@ AddTest[journalFileHandlingTestsInternal, "testMergeJournals",
 End[]; (* End "MLedger`Private`" *)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Read/WriteToJournal*)
 
 
@@ -473,7 +473,16 @@ AddTest[readWriteJournalTests, "testReadWriteJournal",
    AssertEquals["2003-10-30", Normal@journalRead[[3, "date"]]];
    AssertEquals["2003-10-21", Normal@journalRead[[-3, "date"]]];
   ];
-  
+ (* ReadJournal[] *)
+ With[{journalRead = ReadJournal[]},
+   AssertTrue[IsJournal@journalRead];
+   AssertEquals[17, Length@journalRead];
+   AssertEquals["BoA Savings", Normal@journalRead[[1, "account"]]];
+   AssertEquals["BoA Checking", Normal@journalRead[[2, "account"]]];
+   AssertEquals["2004-11-03", Normal@journalRead[[3, "date"]]];
+   AssertEquals["2003-10-21", Normal@journalRead[[-3, "date"]]];
+  ];
+ 
  (* Check writing into journal, not overwriting *)
  WriteToJournal[exampleJournal];
  With[{journalRead = ReadJournal["BoA Checking", 2003]},

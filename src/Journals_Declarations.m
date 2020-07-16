@@ -51,6 +51,7 @@ ReadJournal[journal] reads the saved journal with account and year corresponding
 those of the argument journal. If the latter is with mixed years/accounts, \
 will instead give ReadJournal[___, False, ___]. 
 
+ReadJournal[] reads and merges all journals.
 ReadJournal[account] reads and merges all journals for all years for the given account.
 ReadJournal[year] reads and merges all journals for all accounts for the given year.";
 

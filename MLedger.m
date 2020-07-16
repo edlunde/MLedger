@@ -141,6 +141,7 @@ ReadJournal[journal] reads the saved journal with account and year corresponding
 those of the argument journal. If the latter is with mixed years/accounts, \
 will instead give ReadJournal[___, False, ___]. 
 
+ReadJournal[] reads and merges all journals.
 ReadJournal[account] reads and merges all journals for all years for the given account.
 ReadJournal[year] reads and merges all journals for all accounts for the given year.";
 
@@ -629,6 +630,8 @@ AddCalculatedBalances[journal_?IsJournal, incomingBalance_?NumericQ] :=
  ]
 
 calcBalancePosition[entry_?IsJournalEntry] := 
+ (* If calcBalance column exists, we replace it by inserting after.
+     If not, insert after balance column. *)
  If[KeyExistsQ[entry, "calcBalance"],
   Position[Keys@entry, "calcBalance"] + 1,
   Position[Keys@entry, "balance"] + 1
@@ -676,7 +679,8 @@ Module[{journalDir = ""},
 ListAccountsWithJournals::extraFiles = "Warning: found files not recognized as beloning \
 to journals - `1`";
 ListAccountsWithJournals[] :=
- With[{journalFolders = FileNameTake /@ FileNames[Except["."] ~~ __, GetJournalDir[]]},
+ With[{journalFolders = 
+   FileNameTake /@ FileNames[Except["."] ~~ __, GetJournalDir[]]},
   messageIfNot[Not@MemberQ[journalFolders, x_ /; Not@BankAccountNameQ@x],
    ListAccountsWithJournals::extraFiles, 
    Select[journalFolders, Not@BankAccountNameQ@# &]
@@ -701,6 +705,8 @@ ReadJournal[account_String] :=
   FileNames[journalFilenamePattern, formatJournalDirectory@account]]
 ReadJournal[year_Integer] :=
  mergeJournals[ReadJournal[#, year] & /@ ListAccountsWithJournals[]]
+ReadJournal[] :=
+ mergeJournals[ReadJournal /@ ListAccountsWithJournals[]]
 
 readJournalFile[filename_String] := CreateJournal@importCSV[filename]
 
