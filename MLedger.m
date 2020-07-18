@@ -921,8 +921,11 @@ ReadLedger[year_Integer, month_Integer] :=
    CreateLedger[]
    ]
  ]
-
+ReadLedger[year_Integer] := 
+ mergeLedgers[ReadLedger[year, #] & /@ Range[12]]
+ 
 readLedgerFile[filename_String] := CreateLedger@importCSV[filename]
+mergeLedgers[ledgers: {__?IsLedger}] := Join@@Reverse[ledgers]
 
 
 WriteLedgerFromJournalFiles[year_Integer] :=

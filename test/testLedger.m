@@ -162,7 +162,7 @@ AddTest[ledgerObjectTests, "testGetBalancesFromLedger",
 ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test ledger file handling*)
 
 
@@ -264,6 +264,16 @@ AddTest[readWriteLedgerTests, "testReadWriteLedger",
    AssertEquals["BoA Checking", Normal@ledgerRead[[1, "account"]]];
    AssertEquals["2003-11-03", Normal@ledgerRead[[3, "date"]]];
    AssertEquals[123, Normal@ledgerRead[[4, "credit"]]];
+  ];
+  
+ (* Test for whole year *)
+ With[{ledgerRead = ReadLedger[2003]},
+   AssertTrue[IsLedger@ledgerRead];
+   AssertEquals[16, Length@ledgerRead];
+   AssertEquals["BoA Checking", Normal@ledgerRead[[1, "account"]]];
+   AssertEquals["2003-11-03", Normal@ledgerRead[[3, "date"]]];
+   AssertEquals["2003-10-14", Normal@ledgerRead[[-1, "date"]]];
+   AssertEquals[200., Normal@ledgerRead[[-2, "credit"]]];
   ];
 ];
 
