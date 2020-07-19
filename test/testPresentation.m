@@ -181,13 +181,17 @@ AddTest[yearBalanceSheetTests, "testCreateYearBalanceSheet",
   AssertTrue@IsLedger@ledger;
   AssertTrue@IsBalances@balances;
   
-  (* Add account. 
-     Note it is missing from balances; needed to test behavior when accounts are added
-     during the year. *)
+  (* Add accounts 
+     Note "Other account" is missing from balances; needed to test behavior 
+     when accounts are added during the year. 
+     "Inactive account" is inactive, i.e. it has no entries and should be removed *)
   AddNordeaAccount@"Other account";
-  AssertEquals[{"BoA Checking", "BoA Savings", "Other account"}, ListBankAccounts[]];
+  AddNordeaAccount@"Inactive account";
+  AssertEquals[{"BoA Checking", "BoA Savings", "Other account", "Inactive account"}, 
+   ListBankAccounts[]];
   
-  SetAccountCategories[{{"BoA Checking", "Other account"}, {"BoA Savings"}}];
+  SetAccountCategories[
+   {{"BoA Checking", "Other account"}, {"BoA Savings", "Inactive account"}}];
   With[{balanceSheet = 
     CreateYearBalanceSheet[ledger, balances]},
    AssertMatch[Labeled[Column[List[__], ___], ___], balanceSheet];
@@ -219,6 +223,9 @@ AddTest[yearBalanceSheetTests, "testCreateYearBalanceSheet",
    (* Check empty incoming is "" *)
    AssertEquals[{""}, 
     Cases[balanceSheet, {"Other account", vals__} :> {vals}[[1]], All]];
+    
+   (* Check inactive account is removed *)
+   AssertEquals[{}, Cases[balanceSheet, "Inactive account", All]];
   ];
  ];
 ];

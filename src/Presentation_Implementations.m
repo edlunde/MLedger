@@ -192,7 +192,7 @@ createYearBalanceSheetLedgerSplitByMonth[
  
 createYearBalanceData[ledgers : {__?IsLedger}, incomingBalances_?IsBalances] := 
  createAccountBalancesByMonth[ledgers, incomingBalances] //
-  divideByAccountCategory// addYearBalanceSheetSummary
+  removeInactiveAccounts // divideByAccountCategory// addYearBalanceSheetSummary
 
 formatYearBalanceTitle[ledgers : {__?IsLedger}] :=
  DateString[ledgers[[1]][1, "date"], {"Year"}]
@@ -222,6 +222,9 @@ addIncomingAndTotal[monthBalances_, incomingAccountAssoc_] :=
   Query[Transpose]@RotateLeft@Prepend[monthBalances, "Incoming" -> incomingAccountAssoc])
 fixMissingIncoming[data_] := data /. Missing["KeyAbsent", _] -> ""
 
+
+removeInactiveAccounts[accountBalances_] := 
+ Select[accountBalances, Chop@Total@Abs[# /. "" -> 0] > 0 &]
 
 divideByAccountCategory[accountBalances_Association] :=
  addTotalFooter /@ DeleteMissing[Query[GetAccountCategories[]]@accountBalances, 2]
