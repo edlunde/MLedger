@@ -168,7 +168,7 @@ GetAccountCategories[] :=
  If[accountCategories === "not set",
   Message[GetAccountCategories::notSet];
    <|"Some accounts" -> #1, "Rest of accounts" -> #2|>& @@
-    Partition[#, Ceiling[Length@#/2]]& @ ListBankAccounts[],
+    Partition[#, UpTo[Ceiling[Length@#/2]]]& @ ListBankAccounts[],
   accountCategories
  ];
  

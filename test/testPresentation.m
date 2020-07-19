@@ -232,6 +232,18 @@ AddTest[yearBalanceSheetTests, "testSetAccountCategories",
   AssertEquals[
    <|"Some accounts" -> {"BoA Checking"}, "Rest of accounts" -> {"BoA Savings"}|>, 
    defaultCategories];
+   
+  (* Check with more accounts *)
+  AddNordeaAccount /@ {"Other account", "Another account", "One more account"};
+  AssertEquals[{"BoA Checking", "BoA Savings", "Other account", 
+    "Another account", "One more account"}, 
+   ListBankAccounts[]];
+  AssertMessage[GetAccountCategories::notSet,
+   defaultCategories = GetAccountCategories[]];
+  AssertEquals[
+   <|"Some accounts" -> {"BoA Checking", "BoA Savings", "Other account"}, 
+     "Rest of accounts" -> {"Another account", "One more account"}|>, 
+   defaultCategories];
  ];
  
  (* Test just giving a split of accounts *)
