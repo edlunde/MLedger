@@ -169,17 +169,25 @@ AddTest[yearBalanceSheetTests, "testCreateYearBalanceSheet",
  With[{
   ledger = CreateLedger@CreateJournal[CreateJournalEntry@@@
     (* Create ledger with several months but only a single year *)
-    Select[exampleJournalData2, First@DateList@First@#1 == 2003 &]
+    Select[
+     (* Add account by replacing every third row in exampleJournalData2 *)
+     ReplacePart[exampleJournalData2, {i_ /; Mod[i, 3] == 2, 5} -> "Other account"], 
+     First@DateList@First@#1 == 2003 &]
     ],
-  balances = CreateBalancesObject[exampleJournalData2[[1, 1]],
-   AssociationThread[ListBankAccounts[] -> {0.55, 0.55}]]
+  balances = CreateBalancesObject["2003-01-01",
+   AssociationThread[{"BoA Checking", "BoA Savings"} -> {0.55, 2}]]
   },
   
   AssertTrue@IsLedger@ledger;
   AssertTrue@IsBalances@balances;
-  AssertEquals[{"BoA Checking", "BoA Savings"}, ListBankAccounts[]];
   
-  SetAccountCategories[{{"BoA Checking"}, {"BoA Savings"}}];
+  (* Add account. 
+     Note it is missing from balances; needed to test behavior when accounts are added
+     during the year. *)
+  AddNordeaAccount@"Other account";
+  AssertEquals[{"BoA Checking", "BoA Savings", "Other account"}, ListBankAccounts[]];
+  
+  SetAccountCategories[{{"BoA Checking", "Other account"}, {"BoA Savings"}}];
   With[{balanceSheet = 
     CreateYearBalanceSheet[ledger, balances]},
    AssertMatch[Labeled[Column[List[__], ___], ___], balanceSheet];
@@ -198,12 +206,19 @@ AddTest[yearBalanceSheetTests, "testCreateYearBalanceSheet",
     ];
     
    (* Check some values *)
-   AssertEquals[{{1, -106}}, 
-    Cases[balanceSheet, {"BoA Savings", vals__?NumericQ} :> {vals}[[;;2]], All]];
+   AssertEquals[{{2, -104, -229, 123}},
+    Cases[balanceSheet, {"BoA Savings", vals__?NumericQ} :> {vals}[[;;4]], All]];
     
    (* Check months ordered *)
    AssertEquals[{{"Oct", "Nov"}}, 
     Union@Cases[balanceSheet, {"", "Incoming", "Balance", months__} :> {months}, All]];
+    
+   (* Check empty field is "" *)
+   AssertEquals[{""}, 
+    Cases[balanceSheet, {"BoA Checking", vals__} :> {vals}[[-1]], All]];
+   (* Check empty incoming is "" *)
+   AssertEquals[{""}, 
+    Cases[balanceSheet, {"Other account", vals__} :> {vals}[[1]], All]];
   ];
  ];
 ];

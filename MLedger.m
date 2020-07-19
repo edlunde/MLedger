@@ -1246,13 +1246,13 @@ addBudgetSummaryTable[categoriesWithBalances_] :=
 (*Year balance sheet*)
 
 
-CreateYearBalanceSheet[ledger_?IsLedger, incomingBalance_?IsBalances] := 
- CreateYearBalanceSheet[{ledger}, incomingBalance]
+CreateYearBalanceSheet[ledger_?IsLedger, incomingBalances_?IsBalances] := 
+ CreateYearBalanceSheet[{ledger}, incomingBalances]
 
-CreateYearBalanceSheet[ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
+CreateYearBalanceSheet[ledgers : {__?IsLedger}, incomingBalances_?IsBalances] :=
  createYearBalanceSheetLedgerSplitByMonth[
   splitLedgerByMonthAndYear[Join@@ledgers], 
-  incomingBalance]
+  incomingBalances]
 
 
 Module[{
@@ -1281,14 +1281,14 @@ resetAccountCategories[] := accountCategories = "not set"
 
 
 createYearBalanceSheetLedgerSplitByMonth[
-  ledgers : {__?IsLedger}, incomingBalance_?IsBalances] :=
+  ledgers : {__?IsLedger}, incomingBalances_?IsBalances] :=
  formatYearBalanceSheet[
-  createYearBalanceData[ledgers, incomingBalance],
+  createYearBalanceData[ledgers, incomingBalances],
   formatYearBalanceTitle@ledgers
   ]
  
-createYearBalanceData[ledgers : {__?IsLedger}, incomingBalance_?IsBalances] := 
- createAccountBalancesByMonth[ledgers, incomingBalance] //
+createYearBalanceData[ledgers : {__?IsLedger}, incomingBalances_?IsBalances] := 
+ createAccountBalancesByMonth[ledgers, incomingBalances] //
   divideByAccountCategory// addYearBalanceSheetSummary
 
 formatYearBalanceTitle[ledgers : {__?IsLedger}] :=
@@ -1304,17 +1304,20 @@ formatYearBalanceSheet[yearBalanceData_, title_] :=
    Spacings -> 3]
 
 
-createAccountBalancesByMonth[ledgers : {__?IsLedger}, incoming_?IsBalances] :=
- addIncomingAndTotal[getMonthBalances[ledgers], getAccountAssoc@incoming]
+createAccountBalancesByMonth[ledgers : {__?IsLedger}, incomingBalances_?IsBalances] :=
+ addIncomingAndTotal[getMonthBalances[ledgers], getAccountAssoc@incomingBalances]
 
 getMonthBalances[ledgers : {__?IsLedger}] :=
  getMonthShort@# -> 
-  Query[ListBankAccounts[], 1]@GetBalancesFromLedger@# & /@ ledgers // Association
+  fixMissing@Query[ListBankAccounts[], 1]@GetBalancesFromLedger@# & /@ 
+   ledgers // Association
 getMonthShort[ledger_?IsLedger] := DateString[ledger[1, "date"], {"MonthNameShort"}]
+fixMissing[obj_] := obj /. "KeyAbsent" -> ""
 
 addIncomingAndTotal[monthBalances_, incomingAccountAssoc_] := 
- RotateRight[#, 2] & /@ (addTotalFooter[#, "Balance"] & /@ (*fixMissingIncoming /@*)
+ RotateRight[#, 2] & /@ (addTotalFooter[#, "Balance"] & /@ fixMissingIncoming /@
   Query[Transpose]@RotateLeft@Prepend[monthBalances, "Incoming" -> incomingAccountAssoc])
+fixMissingIncoming[data_] := data /. Missing["KeyAbsent", _] -> ""
 
 
 divideByAccountCategory[accountBalances_Association] :=
