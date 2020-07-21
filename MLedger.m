@@ -220,7 +220,11 @@ CreateBalancesObject::usage = "CreateBalancesObject[date, accountBalances] creat
 a balances object with the given date and accountBalances.
 
 CreateBalancesObject[date, <|accountName -> balance, ...|>] creates a balances object \
-with balances for given accounts.";
+with balances for given accounts. \
+
+CreateBalancesObject[date, ledger, incomingBalances] creates a balances object for date \
+under the assumption that ledger contains all events between the date of \
+incomingBalances and date.";
 
 IsBalances::usage = "IsBalances[obj] returns True if obj is recognized as a balances \
 object, false otherwise.";
@@ -247,7 +251,8 @@ GetBalancesDir::usage = "GetBalancesDir[] returns the directory used for balance
 SetBalancesDir::usage = "SetBalancesDir[directory] sets the directory used for balances.";
 
 
-ReadBalances::usage = "ReadBalances[date] reads the balance file for the given date.";
+ReadBalances::usage = "ReadBalances[date] reads the balance file for the given date \
+(if it exists).";
 
 WriteToBalances::usage = "WriteToBalances[balances] writes the given balances object \
 to GetBalancesDir[]/date.csv";
@@ -314,6 +319,13 @@ messageIfNot[condition_, message_, messageArgs___] :=
 
 
 toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
+
+
+decrementDate[date_List] := Round@DateList@PreviousDate[date, "Day"]
+decrementDate[date_String] := toDateString@decrementDate@DateList@date
+
+incrementDate[date_List] := Round@DateList@NextDate[date, "Day"]
+incrementDate[date_String] := toDateString@incrementDate@DateList@date
 
 
 sortByDateDescending[list_] /; And @@ (KeyExistsQ[#, "date"] & /@ list):=
@@ -988,6 +1000,22 @@ CreateBalancesObject[date_String, assoc_?AssociationQ] /;
    KeyValueMap[<|"account" -> #1, "balance" -> #2|> & , assoc],
    "account"]
   ]
+
+
+CreateBalancesObject[date_, ledger_?IsLedger, incomingBalances_?IsBalances] := 
+ addBalancesObjects[incomingBalances, balancesObjectFromLedger[ledger]]
+ 
+addBalancesObjects[balances__?IsBalances] :=
+ CreateBalancesObject[
+  toDateString@Max[DateObject /@ {balances}[[All, 1]]],
+  Merge[Query[All, #account -> #balance &][#[[2]]] & /@ {balances}, Total]]
+  
+balancesObjectFromLedger[emptyLedger_Dataset] /; Normal@emptyLedger === {} := {}
+balancesObjectFromLedger[ledger_?IsLedger] :=
+ CreateBalancesObject[ledger[1, "date"],
+  Association@@Normal[
+   Query[ListBankAccounts[], 1 /* fixMissing]@GetBalancesFromLedger[ledger]
+   ]]
 
 
 IsBalances[obj_Association] := HasKeysQ[obj, {"date", "accountBalances"}] && 

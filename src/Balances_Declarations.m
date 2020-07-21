@@ -8,7 +8,11 @@ CreateBalancesObject::usage = "CreateBalancesObject[date, accountBalances] creat
 a balances object with the given date and accountBalances.
 
 CreateBalancesObject[date, <|accountName -> balance, ...|>] creates a balances object \
-with balances for given accounts.";
+with balances for given accounts. \
+
+CreateBalancesObject[date, ledger, incomingBalances] creates a balances object for date \
+under the assumption that ledger contains all events between the date of \
+incomingBalances and date.";
 
 IsBalances::usage = "IsBalances[obj] returns True if obj is recognized as a balances \
 object, false otherwise.";
@@ -35,7 +39,8 @@ GetBalancesDir::usage = "GetBalancesDir[] returns the directory used for balance
 SetBalancesDir::usage = "SetBalancesDir[directory] sets the directory used for balances.";
 
 
-ReadBalances::usage = "ReadBalances[date] reads the balance file for the given date.";
+ReadBalances::usage = "ReadBalances[date] reads the balance file for the given date \
+(if it exists).";
 
 WriteToBalances::usage = "WriteToBalances[balances] writes the given balances object \
 to GetBalancesDir[]/date.csv";

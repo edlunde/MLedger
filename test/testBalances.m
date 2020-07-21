@@ -3,7 +3,7 @@
 AddSuite[MLedgerTests, balancesTests];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Test balances objects*)
 
 
@@ -58,6 +58,44 @@ AddTest[testBalancesObject, "testCreateBalancesObject",
  
  AssertTrue[KeyExistsQ[#, "date"] & @ CreateBalancesObject["1", <|"acc1" -> 1, "acc2" -> 3|>]];
  AssertTrue[KeyExistsQ[#, "accountBalances"] & @ CreateBalancesObject["1", <|"acc1" -> 1|>]];
+];
+
+
+
+
+AddSuite[testBalancesObject, testBalancesObjectFromLedger];
+AddTest[testBalancesObjectFromLedger, "Set Up", 
+ SetBankAccounts[{}];
+ AddBoAAccount/@{"BoA Checking", "BoA Savings"};
+];
+
+AddTest[testBalancesObjectFromLedger, "Tear Down", 
+ SetBankAccounts[{}];
+];
+
+AddTest[testBalancesObjectFromLedger, "testCreateBalancesObjectFromLedger",
+ AssertEquals[{"BoA Checking", "BoA Savings"}, ListBankAccounts[]];
+ With[{
+   exampleLedger = CreateLedger@CreateJournal[
+    (* Replace account (field 5) of every second line with another one *)
+    CreateJournalEntry@@@ReplacePart[
+     exampleJournalData, {i_ /; Mod[i, 2] == 0, 5} -> "BoA Savings"]]},
+  AssertTrue@IsLedger@exampleLedger;
+  With[{date = First[exampleLedger]["date"],
+    incomingBalances = CreateBalancesObject[
+      MLedger`Private`decrementDate@Last[exampleLedger]["date"], 
+      <|"BoA Checking" -> 3.30, "BoA Savings" -> 0.1|>]},
+   AssertEquals["2003-11-08", date];
+   AssertTrue@IsBalances@incomingBalances;
+   
+   With[{balances = CreateBalancesObject[date, exampleLedger, incomingBalances]},
+    AssertTrue@IsBalances@balances;
+    AssertEquals[date, balances["date"]];
+    AssertEquals[<|"BoA Checking" -> 522.63, "BoA Savings" -> -592.25|>, 
+     MLedger`Private`getAccountAssoc@balances];
+   ]
+  ]
+ ]
 ];
 
 

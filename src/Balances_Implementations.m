@@ -18,6 +18,22 @@ CreateBalancesObject[date_String, assoc_?AssociationQ] /;
   ]
 
 
+CreateBalancesObject[date_, ledger_?IsLedger, incomingBalances_?IsBalances] := 
+ addBalancesObjects[incomingBalances, balancesObjectFromLedger[ledger]]
+ 
+addBalancesObjects[balances__?IsBalances] :=
+ CreateBalancesObject[
+  toDateString@Max[DateObject /@ {balances}[[All, 1]]],
+  Merge[Query[All, #account -> #balance &][#[[2]]] & /@ {balances}, Total]]
+  
+balancesObjectFromLedger[emptyLedger_Dataset] /; Normal@emptyLedger === {} := {}
+balancesObjectFromLedger[ledger_?IsLedger] :=
+ CreateBalancesObject[ledger[1, "date"],
+  Association@@Normal[
+   Query[ListBankAccounts[], 1 /* fixMissing]@GetBalancesFromLedger[ledger]
+   ]]
+
+
 IsBalances[obj_Association] := HasKeysQ[obj, {"date", "accountBalances"}] && 
  IsAccountBalances@obj["accountBalances"]
 IsBalances[___] := False
