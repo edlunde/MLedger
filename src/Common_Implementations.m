@@ -10,11 +10,18 @@ messageIfNot[condition_, message_, messageArgs___] :=
  If[condition, True, Message[message, messageArgs]; False]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Dates*)
 
 
 toDateString[date_] := DateString[date, {"Year", "-", "Month", "-", "Day"}]
+
+
+decrementDate[date_List] := Round@DateList@PreviousDate[date, "Day"]
+decrementDate[date_String] := toDateString@decrementDate@DateList@date
+
+incrementDate[date_List] := Round@DateList@NextDate[date, "Day"]
+incrementDate[date_String] := toDateString@incrementDate@DateList@date
 
 
 sortByDateDescending[list_] /; And @@ (KeyExistsQ[#, "date"] & /@ list):=

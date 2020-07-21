@@ -16,6 +16,14 @@ AddTest[datesTests, "testToDateString",
  AssertEquals["2004-01-01", toDateString["2004-01-01"]];
 ];
 
+AddTest[datesTests, "test/In/De/crementDate",
+ AssertEquals[{2004, 1, 1, 0, 0, 0}, incrementDate[{2003, 12, 31, 0, 0, 0}]];
+ AssertEquals["2004-01-01", incrementDate["2003-12-31"]];
+ 
+ AssertEquals[{2003, 12, 31, 0, 0, 0}, decrementDate[{2004, 1, 1, 0, 0, 0}]];
+ AssertEquals["2003-12-31", decrementDate["2004-01-01"]];
+];
+
 AddTest[datesTests, "testSortByDateDescending",
  AssertEquals[sortByDateDescending, 
   Head@sortByDateDescending@{<|"date" -> "2004-01-01"|>, <|"notdate" -> "2004-14-99"|>}];
